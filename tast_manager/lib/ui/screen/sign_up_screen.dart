@@ -8,16 +8,16 @@ import 'package:tast_manager/widgets/show_snackber_message.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/background_screen.dart';
 
-class SingUpScreen extends StatefulWidget {
+class SignUpScreen extends StatefulWidget {
   static String name = 'sing-up-screen';
 
-  const SingUpScreen({super.key});
+  const SignUpScreen({super.key});
 
   @override
-  State<SingUpScreen> createState() => _SingUpScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SingUpScreenState extends State<SingUpScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController emailTEController = TextEditingController();
   TextEditingController passwordTEController = TextEditingController();
   TextEditingController firstNameTEController = TextEditingController();

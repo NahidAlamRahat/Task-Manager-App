@@ -8,7 +8,7 @@ import 'package:tast_manager/data/utils/urls.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
 import 'package:tast_manager/ui/screen/bottom_nav_screen/main_bottom_nav_screen.dart';
 import 'package:tast_manager/ui/screen/forget_pass_email_verification_screen.dart';
-import 'package:tast_manager/ui/screen/sing_up_sreen.dart';
+import 'package:tast_manager/ui/screen/sign_up_screen.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
 
 import '../../utils/app_colors.dart';
@@ -23,6 +23,8 @@ class SignInScreen extends StatefulWidget {
   State<SignInScreen> createState() => _SignInScreenState();
 }
 
+bool _signInInProgress = false;
+
 class _SignInScreenState extends State<SignInScreen> {
   TextEditingController emailTEController = TextEditingController();
   TextEditingController passwordTEController = TextEditingController();
@@ -30,9 +32,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme
-        .of(context)
-        .textTheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       body: BackgroundScreen(
@@ -56,9 +56,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       TextFormField(
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          if (value
-                              ?.trim()
-                              .isEmpty ?? true) {
+                          if (value?.trim().isEmpty ?? true) {
                             return 'Enter your email';
                           }
                           return null;
@@ -73,9 +71,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       TextFormField(
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
-                          if (value
-                              ?.trim()
-                              .isEmpty ?? true) {
+                          if (value?.trim().isEmpty ?? true) {
                             return 'Enter your password';
                           }
                           return null;
@@ -90,15 +86,22 @@ class _SignInScreenState extends State<SignInScreen> {
                 const SizedBox(
                   height: 12,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      ///code here
-                      setState(() {});
-                      logInRequest();
-                    }
-                  },
-                  child: const Icon(Icons.arrow_circle_right_outlined),
+                Visibility(
+                  visible: _signInInProgress == false,
+                  replacement: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        ///code here
+                        setState(() {
+                          logInRequest();
+                        });
+                      }
+                    },
+                    child: const Icon(Icons.arrow_circle_right_outlined),
+                  ),
                 ),
                 const SizedBox(
                   height: 20,
@@ -123,7 +126,6 @@ class _SignInScreenState extends State<SignInScreen> {
                     ],
                   ),
                 ),
-
               ],
             ),
           ),
@@ -148,7 +150,7 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.pushNamed(context, SingUpScreen.name);
+                Navigator.pushNamed(context, SignUpScreen.name);
               },
           ),
         ],
@@ -156,38 +158,33 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-
   Future<void> logInRequest() async {
+    _signInInProgress = true;
     setState(() {});
     Map<String, dynamic> logInBody = {
       "email": emailTEController.text.trim(),
       "password": passwordTEController.text,
     };
 
-    final NetworkResponse response = await NetworkCaller.postRequest(
-        url: Urls.loginUrl, body: logInBody);
-       if(response.isSuccess){
-         setState(() {});
-
+    final NetworkResponse response =
+        await NetworkCaller.postRequest(url: Urls.loginUrl, body: logInBody);
+    if (response.isSuccess) {
+      _signInInProgress = false;
       ///use Shared_Preferences
       String token = response.statusData!['token'];
-      UserData userData= UserData.fromJson(response.statusData!['data']);
-      await  AuthController.saveData(token, userData);
+      UserData userData = UserData.fromJson(response.statusData!['data']);
+      await AuthController.saveData(token, userData);
+      setState(() {});
 
       Mymessage('LogIn Success', context);
-      Navigator.pushReplacementNamed(
-          context, MainBottomNavScreen.name);
-    }
-    else{
-      setState(() {});
+      Navigator.pushReplacementNamed(context, MainBottomNavScreen.name);
+    } else {
+      _signInInProgress = false;
       debugPrint('Status Code = ${response.statusCode}');
-    debugPrint('${response.statusData}');
-    Mymessage('something error', context);
+      debugPrint('${response.statusData}');
+      Mymessage('something error', context);
     }
-
-
   } //logInRequest end
-
 
   @override
   void dispose() {

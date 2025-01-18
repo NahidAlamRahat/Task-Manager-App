@@ -28,6 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 2));
     bool userLoggedIn = await AuthController.userLoggedIn();
     if(userLoggedIn){
+      setState(() {});
       Navigator.pushReplacementNamed(context, MainBottomNavScreen.name);
 
     }

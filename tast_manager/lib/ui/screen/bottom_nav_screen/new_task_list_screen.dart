@@ -18,7 +18,7 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: TaskManagerAppBer(textTheme: textTheme),
+      appBar: TaskManagerAppBar(textTheme: textTheme),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, AddNewTaskScreen.name);

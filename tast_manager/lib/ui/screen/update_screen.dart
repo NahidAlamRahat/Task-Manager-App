@@ -29,7 +29,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: TaskManagerAppBer(
+      appBar: TaskManagerAppBar(
         textTheme: textTheme,
         fromUpdateProfile: true,
       ),

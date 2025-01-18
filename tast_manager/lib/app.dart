@@ -5,7 +5,7 @@ import 'package:tast_manager/ui/screen/forget_pass_email_verification_screen.dar
 import 'package:tast_manager/ui/screen/forget_pass_pin_verification_screen.dart';
 import 'package:tast_manager/ui/screen/forget_pass_reset_password_screen.dart';
 import 'package:tast_manager/ui/screen/sign_in_screen.dart';
-import 'package:tast_manager/ui/screen/sing_up_sreen.dart';
+import 'package:tast_manager/ui/screen/sign_up_screen.dart';
 import 'package:tast_manager/ui/screen/splash_screen.dart';
 import 'package:tast_manager/ui/screen/update_screen.dart';
 import 'package:tast_manager/utils/app_colors.dart';
@@ -84,8 +84,8 @@ class TaskManager extends StatelessWidget {
         else if(settings.name ==ForgetPassEmailVerification.name ){
           widget = const ForgetPassEmailVerification();
         }
-        else if(settings.name == SingUpScreen.name){
-          widget = const SingUpScreen();
+        else if(settings.name == SignUpScreen.name){
+          widget = const SignUpScreen();
         }
         else if(settings.name == ForgetPassPinVerification.name){
           widget = const ForgetPassPinVerification();

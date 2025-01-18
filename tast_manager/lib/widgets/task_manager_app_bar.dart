@@ -5,15 +5,35 @@ import 'package:tast_manager/ui/screen/update_screen.dart';
 
 import '../utils/app_colors.dart';
 
-class TaskManagerAppBer extends StatelessWidget implements PreferredSizeWidget {
-  const TaskManagerAppBer({
+class TaskManagerAppBar extends StatefulWidget implements PreferredSizeWidget {
+  const TaskManagerAppBar({
     super.key,
     required this.textTheme,
     this.fromUpdateProfile = false,
   });
 
-   final bool fromUpdateProfile;
+  final bool fromUpdateProfile;
   final TextTheme textTheme;
+
+  @override
+  State<TaskManagerAppBar> createState() => _TaskManagerAppBarState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(56);
+}
+
+class _TaskManagerAppBarState extends State<TaskManagerAppBar> {
+  @override
+  void initState() {
+    super.initState();
+    _refreshUserData();
+  }
+
+  /// User data refresh function
+  Future<void> _refreshUserData() async {
+    await AuthController.getUserData();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +48,7 @@ class TaskManagerAppBer extends StatelessWidget implements PreferredSizeWidget {
           Expanded(
             child: GestureDetector(
               onTap: () {
-                if(fromUpdateProfile == false){
+                if (widget.fromUpdateProfile == false) {
                   Navigator.pushNamed(context, UpdateScreen.name);
                 }
               },
@@ -37,35 +57,38 @@ class TaskManagerAppBer extends StatelessWidget implements PreferredSizeWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    AuthController.userModel?.fullName?? '',
-                    style: textTheme.titleLarge?.copyWith(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                    AuthController.userModel?.fullName ?? 'Unknown User',
+                    style: widget.textTheme.titleLarge?.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   Text(
-                    AuthController.userModel?.email ?? '',
-                    style: textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold, color: Colors.white),
+                    AuthController.userModel?.email ?? 'Unknown Email',
+                    style: widget.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-
                 ],
               ),
             ),
           ),
-
-          ///log Out button
-          IconButton(onPressed: () {
-            AuthController.clearData();
-            Navigator.pushNamedAndRemoveUntil(context, SignInScreen.name, (route) => false,);
-
-          }, icon: const Icon(Icons.output)),
+          /// Logout button
+          IconButton(
+            onPressed: () async {
+              await AuthController.clearData();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                SignInScreen.name,
+                    (route) => false,
+              );
+            },
+            icon: const Icon(Icons.output),
+          ),
         ],
       ),
     );
   }
-
-  @override
-  // TODO: implement preferredSize
-  Size get preferredSize => const Size.fromHeight(56);
 }

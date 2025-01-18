@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:tast_manager/ui/screen/bottom_nav_screen/main_bottom_nav_screen.dart';
 import 'package:tast_manager/ui/screen/forget_pass_email_verification_screen.dart';
-import 'package:tast_manager/ui/screen/sing_up_sreen.dart';
+import 'package:tast_manager/ui/screen/sign_up_screen.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
 import 'package:tast_manager/widgets/task_manager_app_bar.dart';
 
@@ -28,7 +28,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: TaskManagerAppBer(textTheme: textTheme),
+      appBar: TaskManagerAppBar(textTheme: textTheme),
       body: BackgroundScreen(
         child: SingleChildScrollView(
           child: Padding(

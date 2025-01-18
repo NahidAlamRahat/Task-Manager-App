@@ -16,7 +16,7 @@ class _PendingTaskListScreenState extends State<PendingTaskListScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: TaskManagerAppBer(textTheme: textTheme),
+      appBar: TaskManagerAppBar(textTheme: textTheme),
       body: BackgroundScreen(
         child: Column(
           children: [
