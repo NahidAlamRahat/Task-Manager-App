@@ -75,6 +75,7 @@ class _TaskManagerAppBarState extends State<TaskManagerAppBar> {
               ),
             ),
           ),
+
           /// Logout button
           IconButton(
             onPressed: () async {
