@@ -1,16 +1,22 @@
-import 'package:flutter/gestures.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:tast_manager/ui/screen/forget_pass_reset_password_screen.dart';
-import 'package:tast_manager/ui/screen/sign_in_screen.dart';
-
-import '../../utils/app_colors.dart';
+import 'package:tast_manager/ui/screen/recover_reset_password_screen.dart';
+import '../../data/services/network_caller.dart';
+import '../../data/utils/urls.dart';
 import '../../widgets/background_screen.dart';
+import '../../widgets/show_snackber_message.dart';
 
+/// This class handles the pin verification process during the password recovery flow.
 class ForgetPassPinVerification extends StatefulWidget {
   static String name = 'forget/pass/pin/verification';
 
-  const ForgetPassPinVerification({super.key});
+  final String email;
+
+  const ForgetPassPinVerification({
+    super.key,
+    required this.email,
+  });
 
   @override
   State<ForgetPassPinVerification> createState() =>
@@ -18,9 +24,11 @@ class ForgetPassPinVerification extends StatefulWidget {
 }
 
 class _ForgetPassPinVerificationState extends State<ForgetPassPinVerification> {
-  TextEditingController pinTEController = TextEditingController();
+  TextEditingController otpTEController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
+  /// Builds the UI for the Pin Code input field.
+  /// Ensures that the user can input a 6-digit OTP for verification.
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -31,8 +39,6 @@ class _ForgetPassPinVerificationState extends State<ForgetPassPinVerification> {
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 100),
                 Text(
@@ -74,26 +80,18 @@ class _ForgetPassPinVerificationState extends State<ForgetPassPinVerification> {
                       animationDuration: Duration(milliseconds: 300),
                       backgroundColor: Colors.transparent,
                       enableActiveFill: true,
-                      controller: pinTEController,
+                      controller: otpTEController,
                       appContext: context,
                     )),
-                SizedBox(
-                  height: 12,
-                ),
+                const SizedBox(height: 12,),
                 ElevatedButton(
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
-                      // Navigate to the next screen
-                      Navigator.pushNamed(
-                          context, ForgetPassResetPasswordScreen.name);
+                      _getPinVerify();
                     }
                   },
                   child: const Icon(Icons.arrow_circle_right_outlined),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Center(child: buildRichText())
               ],
             ),
           ),
@@ -102,35 +100,25 @@ class _ForgetPassPinVerificationState extends State<ForgetPassPinVerification> {
     );
   }
 
-  Widget buildRichText() {
-    return RichText(
-      text: TextSpan(
-          text: "Have an account? ",
-          style:  TextStyle(
-            color: AppColors.blackColor,
-            fontWeight: FontWeight.w600,
-          ),
-          children: [
-            TextSpan(
-                text: ' Sign in',
-                style: TextStyle(
-                  color: AppColors.themColor,
-                ),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      SignInScreen.name,
-                      (value) => false,
-                    );
-                  }),
-          ]),
-    );
+  /// Sends the OTP entered by the user to the server for validation.
+  Future<void> _getPinVerify() async {
+    // API Call
+    NetworkResponse networkResponse = await NetworkCaller.getRequest(
+        url: Urls.recoverVerifyOTP(widget.email, otpTEController.text));
+
+    if (networkResponse.statusData?['status'] == 'success') {
+      Navigator.pushNamed(
+          context,
+          arguments: {'otp': otpTEController.text, 'email': widget.email},
+          RecoverResetPasswordScreen.name);
+    } else {
+      Mymessage('Invalid OTP. Please try again.', context);
+    }
   }
 
   @override
   void dispose() {
-    pinTEController.dispose();
+    otpTEController.dispose();
     super.dispose();
   }
 }

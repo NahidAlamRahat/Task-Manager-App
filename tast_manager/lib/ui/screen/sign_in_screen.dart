@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:tast_manager/data/models/user_data.dart';
@@ -23,7 +22,7 @@ class SignInScreen extends StatefulWidget {
   State<SignInScreen> createState() => _SignInScreenState();
 }
 
-bool _signInInProgress = false;
+bool _signInProgress = false;
 
 class _SignInScreenState extends State<SignInScreen> {
   TextEditingController emailTEController = TextEditingController();
@@ -49,10 +48,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   style: textTheme.titleLarge,
                 ),
                 const SizedBox(height: 24),
+                // Form for user login input (email and password)
                 Form(
                   key: formKey,
                   child: Column(
                     children: [
+                      // Email text input field with validation
                       TextFormField(
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
@@ -68,6 +69,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       const SizedBox(
                         height: 12,
                       ),
+                      // Password text input field with validation and hiding text
                       TextFormField(
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
@@ -83,18 +85,17 @@ class _SignInScreenState extends State<SignInScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(
-                  height: 12,
-                ),
+                const SizedBox(height: 12),
+                // Login button with conditional visibility for progress indicator
                 Visibility(
-                  visible: _signInInProgress == false,
+                  visible: _signInProgress == false,
                   replacement: const Center(
                     child: CircularProgressIndicator(),
                   ),
                   child: ElevatedButton(
                     onPressed: () {
+                      // If the form is valid, initiate the login request
                       if (formKey.currentState!.validate()) {
-                        ///code here
                         setState(() {
                           logInRequest();
                         });
@@ -106,9 +107,11 @@ class _SignInScreenState extends State<SignInScreen> {
                 const SizedBox(
                   height: 20,
                 ),
+                // Forgot password and sign-up navigation
                 Center(
                   child: Column(
                     children: [
+                      // Button for forgot password navigation
                       TextButton(
                         style: TextButton.styleFrom(
                             shape: RoundedRectangleBorder(
@@ -122,6 +125,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       const SizedBox(
                         height: 6,
                       ),
+                      // Rich text with clickable sign-up link
                       buildRichText(),
                     ],
                   ),
@@ -134,6 +138,7 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
+  // Method for building a rich text with "Don't have an account?" and sign-up link
   Widget buildRichText() {
     return RichText(
       text: TextSpan(
@@ -150,6 +155,7 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
+                // Navigate to Sign-Up screen when tapped
                 Navigator.pushNamed(context, SignUpScreen.name);
               },
           ),
@@ -158,36 +164,72 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
+  // Method for sending the login request to the server
   Future<void> logInRequest() async {
-    _signInInProgress = true;
+    // Set sign-in progress to true
+    _signInProgress = true;
     setState(() {});
-    Map<String, dynamic> logInBody = {
+
+    // Prepare the login data to be sent in the request body
+    Map<String, dynamic> requestLogInBody = {
       "email": emailTEController.text.trim(),
       "password": passwordTEController.text,
     };
 
+    // Make the API request for login
     final NetworkResponse response =
-        await NetworkCaller.postRequest(url: Urls.loginUrl, body: logInBody);
-    if (response.isSuccess) {
-      _signInInProgress = false;
-      ///use Shared_Preferences
-      String token = response.statusData!['token'];
-      UserData userData = UserData.fromJson(response.statusData!['data']);
-      await AuthController.saveData(token, userData);
-      setState(() {});
+    await NetworkCaller.postRequest(url: Urls.loginUrl, body: requestLogInBody);
 
-      Mymessage('LogIn Success', context);
-      Navigator.pushReplacementNamed(context, MainBottomNavScreen.name);
-    } else {
-      _signInInProgress = false;
-      debugPrint('Status Code = ${response.statusCode}');
-      debugPrint('${response.statusData}');
-      Mymessage('something error', context);
+    // Set sign-in progress to false once the request is complete
+    _signInProgress = false;
+    setState(() {});
+
+    debugPrint('Response Status: ${response.isSuccess}');
+    debugPrint('Response Data: ${response.statusData}');
+
+    // If login is successful, handle the response
+    if (response.isSuccess) {
+      // If the response data is a string, attempt to parse it
+      if (response.statusData is String) {
+        try {
+          response.statusData = jsonDecode(response.statusData as String);
+        } catch (e) {
+          debugPrint('Failed to parse response: $e');
+          Mymessage('Unexpected response from server.', context);
+          return;
+        }
+      }
+
+      // Extract token and user data from the response
+      String? token = response.statusData?['token'];
+      UserData? userData = UserData.fromJson(response.statusData?['data'] ?? {});
+
+      // If the token is available, save the token and user data, then navigate
+      if (token != null) {
+        await AuthController.saveData(token, userData);
+        Mymessage('LogIn Success', context);
+        Navigator.pushReplacementNamed(context, MainBottomNavScreen.name);
+      } else {
+        Mymessage('Token missing in response.', context);
+      }
     }
-  } //logInRequest end
+    // If login fails due to invalid credentials (401 status code)
+    else if (response.statusCode == 401) {
+      Mymessage('Email/Password Invalid. Please try again!', context);
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Error Data: ${response.statusData}');
+    }
+    // Handle any other errors
+    else {
+      Mymessage('An error occurred. Please try again later.', context);
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Error Data: ${response.statusData}');
+    }
+  }
 
   @override
   void dispose() {
+    // Clean up controllers when the widget is disposed
     emailTEController.dispose();
     passwordTEController.dispose();
     super.dispose();

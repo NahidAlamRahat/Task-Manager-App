@@ -16,37 +16,33 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
 
-@override
+  /// Called when the screen is initialized.
+  /// Initiates the move to the next screen based on user login status.
+  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    moveToNextScreen();
+    moveToNextScreen();  // Calls the function to check if the user is logged in
   }
 
-
+  /// Function to check if the user is logged in
+  /// Waits for 2 seconds, then navigates to the appropriate screen
   Future<void> moveToNextScreen() async {
-    await Future.delayed(const Duration(seconds: 2));
-    bool userLoggedIn = await AuthController.userLoggedIn();
-    if(userLoggedIn){
-      setState(() {});
-      Navigator.pushReplacementNamed(context, MainBottomNavScreen.name);
-
+    await Future.delayed(const Duration(seconds: 2));  // Wait for 2 seconds before checking login status
+    bool userLoggedIn = await AuthController.userLoggedIn();  // Checks if the user is logged in
+    if (userLoggedIn) {
+      setState(() {});  // Rebuilds the widget
+      Navigator.pushReplacementNamed(context, MainBottomNavScreen.name);  // Navigate to the main screen if logged in
+    } else {
+      Navigator.pushReplacementNamed(context, SignInScreen.name);  // Navigate to SignIn screen if not logged in
     }
-    else{
-      Navigator.pushReplacementNamed(context, SignInScreen.name);
-
-    }
-
-}
-
+  }
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      
       body: BackgroundScreen(
         child: Center(
-              child: AppLogo(),
+          child: AppLogo(),  // Display the app logo in the center of the screen
         ),
       ),
     );

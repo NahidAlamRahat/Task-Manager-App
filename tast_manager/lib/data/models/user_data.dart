@@ -5,10 +5,10 @@ class UserData {
   String? mobile;
   String? photo;
 
-  String? get fullName{
-    return '$firstName $lastName';
-  }
+  /// full name
+  String? get fullName => '$firstName $lastName';
 
+  /// Constructor to create a UserData object from JSON
   UserData.fromJson(Map<String, dynamic> json) {
     email = json['email'];
     firstName = json['firstName'];
@@ -17,6 +17,7 @@ class UserData {
     photo = json['photo'];
   }
 
+  /// Method to convert UserData object to JSON
   Map<String, dynamic> toJson() {
     return {
       'email': email,

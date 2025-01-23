@@ -31,7 +31,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
     return Scaffold(
       appBar: TaskManagerAppBar(
         textTheme: textTheme,
-        fromUpdateProfile: true,
+        fromUpdateProfile: true, // App bar title and customization for update profile screen
       ),
       body: BackgroundScreen(
         child: SingleChildScrollView(
@@ -46,10 +46,10 @@ class _UpdateScreenState extends State<UpdateScreen> {
                   const SizedBox(height: 30),
                   Text(
                     'Update Profile',
-                    style: textTheme.titleLarge,
+                    style: textTheme.titleLarge,  // Title for the update screen
                   ),
                   const SizedBox(height: 24),
-                  _buildPhotoExchange(),
+                  _buildPhotoExchange(),  // Widget to handle photo exchange (no item selected)
                   const SizedBox(
                     height: 12,
                   ),
@@ -57,13 +57,13 @@ class _UpdateScreenState extends State<UpdateScreen> {
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter an email.';
+                        return 'Enter an email.';  // Email validation
                       }
                       return null;
                     },
                     keyboardType: TextInputType.emailAddress,
                     controller: emailTEController,
-                    decoration: const InputDecoration(hintText: 'Email'),
+                    decoration: const InputDecoration(hintText: 'Email'),  // Email input field
                   ),
                   const SizedBox(
                     height: 12,
@@ -72,13 +72,13 @@ class _UpdateScreenState extends State<UpdateScreen> {
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter your first name';
+                        return 'Enter your first name';  // First name validation
                       }
                       return null;
                     },
                     keyboardType: TextInputType.name,
                     controller: firstNameTEController,
-                    decoration: const InputDecoration(hintText: 'First Name'),
+                    decoration: const InputDecoration(hintText: 'First Name'),  // First name input field
                   ),
                   const SizedBox(
                     height: 12,
@@ -87,13 +87,13 @@ class _UpdateScreenState extends State<UpdateScreen> {
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter your last name';
+                        return 'Enter your last name';  // Last name validation
                       }
                       return null;
                     },
                     keyboardType: TextInputType.name,
                     controller: lastNameTEController,
-                    decoration: const InputDecoration(hintText: 'Last Name'),
+                    decoration: const InputDecoration(hintText: 'Last Name'),  // Last name input field
                   ),
                   const SizedBox(
                     height: 12,
@@ -102,13 +102,13 @@ class _UpdateScreenState extends State<UpdateScreen> {
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter your mobile number';
+                        return 'Enter your mobile number';  // Mobile number validation
                       }
                       return null;
                     },
                     keyboardType: TextInputType.phone,
                     controller: mobileTEController,
-                    decoration: const InputDecoration(hintText: 'Mobile'),
+                    decoration: const InputDecoration(hintText: 'Mobile'),  // Mobile input field
                   ),
                   const SizedBox(
                     height: 12,
@@ -117,12 +117,12 @@ class _UpdateScreenState extends State<UpdateScreen> {
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter an password';
+                        return 'Enter a password';  // Password validation
                       }
                       return null;
                     },
                     controller: passwordTEController,
-                    decoration: const InputDecoration(hintText: 'Password'),
+                    decoration: const InputDecoration(hintText: 'Password'),  // Password input field
                   ),
                   const SizedBox(
                     height: 12,
@@ -131,9 +131,10 @@ class _UpdateScreenState extends State<UpdateScreen> {
                     onPressed: () {
                       if (formKey.currentState!.validate()) {
                         ///code here
+                        // Validation passes, add update functionality here
                       }
                     },
-                    child: const Icon(Icons.arrow_circle_right_outlined),
+                    child: const Icon(Icons.arrow_circle_right_outlined),  // Button to trigger form validation
                   ),
                 ],
               ),
@@ -144,6 +145,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
     );
   }
 
+  /// Builds a widget for photo exchange section
   Widget _buildPhotoExchange() {
     return Container(
       height: 50,
@@ -167,12 +169,12 @@ class _UpdateScreenState extends State<UpdateScreen> {
             child: const Text(
               'Photo',
               style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              TextStyle(color: Colors.white, fontWeight: FontWeight.w600),  // Label for the photo section
             ),
           ),
           const SizedBox(width: 16),
           const Text(
-            'No item selected',
+            'No item selected',  // Placeholder text when no photo is selected
             maxLines: 1,
             style: TextStyle(
               color: Colors.grey,

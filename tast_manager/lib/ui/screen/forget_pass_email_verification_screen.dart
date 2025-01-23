@@ -2,8 +2,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:tast_manager/ui/screen/forget_pass_pin_verification_screen.dart';
 
+import '../../data/services/network_caller.dart';
+import '../../data/utils/urls.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/background_screen.dart';
+import '../../widgets/show_snackber_message.dart';
 
 class ForgetPassEmailVerification extends StatefulWidget {
   static String name = 'forget/pass/email/verification';
@@ -17,8 +20,8 @@ class ForgetPassEmailVerification extends StatefulWidget {
 
 class _ForgetPassEmailVerificationState
     extends State<ForgetPassEmailVerification> {
-  TextEditingController emailTEController = TextEditingController();
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  TextEditingController _emailTEController = TextEditingController(); // Controller for the email field
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Key for the form
 
   @override
   Widget build(BuildContext context) {
@@ -36,49 +39,47 @@ class _ForgetPassEmailVerificationState
                 const SizedBox(height: 100),
                 Text(
                   'Your Email Address',
-                  style: textTheme.titleLarge,
+                  style: textTheme.titleLarge, // Title of the screen
                 ),
                 const SizedBox(
                   height: 6,
                 ),
                 Text(
-                  'A 6 digit verification OTP will sent to your email address',
-                  style: textTheme.titleMedium,
+                  'A 6 digit verification OTP will be sent to your email address',
+                  style: textTheme.titleMedium, // Info text for OTP
                 ),
                 const SizedBox(height: 24),
                 Form(
-                  key: formKey,
+                  key: _formKey, // Attach form validation key
                   child: TextFormField(
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    autovalidateMode: AutovalidateMode.onUserInteraction, // Auto-validate on user interaction
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter an email';
+                        return 'Enter an email'; // Email validation
                       }
                       return null;
                     },
-                    keyboardType: TextInputType.emailAddress,
-                    controller: emailTEController,
-                    decoration: const InputDecoration(hintText: 'Email'),
+                    keyboardType: TextInputType.emailAddress, // Set keyboard to email type
+                    controller: _emailTEController, // Attach controller to field
+                    decoration: const InputDecoration(hintText: 'Email'), // Decoration for the email field
                   ),
                 ),
-                SizedBox(
-                  height: 12,
-                ),
+                const SizedBox(height: 12,),
+
+                // Email verification button
                 ElevatedButton(
                   onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      Navigator.pushNamed(
-                          context, ForgetPassPinVerification.name);
+                    if (_formKey.currentState!.validate()) {
+                      /// Call email verification function
+                      _emailVerification();
                     }
                   },
-                  child: const Icon(Icons.arrow_circle_right_outlined),
+                  child: const Icon(Icons.arrow_circle_right_outlined), // Button icon
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const SizedBox(
-                  height: 6,
-                ),
+                const SizedBox(height: 20),
+                const SizedBox(height: 6),
+
+                // Rich text for navigation to sign-in
                 Center(child: buildRichText())
               ],
             ),
@@ -88,31 +89,53 @@ class _ForgetPassEmailVerificationState
     );
   }
 
+  // Function to create a rich text with a link for users to navigate to sign-in
   Widget buildRichText() {
     return RichText(
       text: TextSpan(
           text: "Have an account? ",
           style:  TextStyle(
-            color: AppColors.blackColor,
-            fontWeight: FontWeight.w600,
+            color: AppColors.blackColor, // Text color for the statement
+            fontWeight: FontWeight.w600, // Text weight for emphasis
           ),
           children: [
+            // "Sign in" link
             TextSpan(
                 text: ' Sign in',
                 style: TextStyle(
-                  color: AppColors.themColor,
+                  color: AppColors.themColor, // Color for the link
                 ),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Navigate back to previous screen
                   }),
           ]),
     );
   }
 
+  /// Function to handle email verification
+  Future<void> _emailVerification() async {
+    // Sending GET request to verify email
+    NetworkResponse networkResponse =
+    await NetworkCaller.getRequest(url: Urls.recoverVerifyEmailUrl(_emailTEController.text));
+
+    // Handle the server response
+    if (networkResponse.isSuccess) {
+      Mymessage('Check your email', context); // Show success message
+      // Navigate to pin verification screen with email argument
+      Navigator.pushNamed(
+          context,
+          ForgetPassPinVerification.name,
+          arguments: _emailTEController.text.trim());
+    } else {
+      Mymessage(networkResponse.errorMessage, context); // Show error message if failed
+    }
+  }
+
+  // Dispose method to clean up the controller when the screen is removed
   @override
   void dispose() {
-    emailTEController.dispose();
-    super.dispose();
+    _emailTEController.dispose(); // Dispose the email controller
+    super.dispose(); // Call dispose on the superclass
   }
 }

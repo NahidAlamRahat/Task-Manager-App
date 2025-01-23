@@ -18,12 +18,17 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  // Controllers for text fields
   TextEditingController emailTEController = TextEditingController();
   TextEditingController passwordTEController = TextEditingController();
   TextEditingController firstNameTEController = TextEditingController();
   TextEditingController lastNameTEController = TextEditingController();
   TextEditingController mobileTEController = TextEditingController();
+
+  // Global key for form validation
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  // To manage the signup progress state
   bool singUpInProgress = false;
 
   @override
@@ -36,22 +41,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Form(
-              key: formKey,
+              key: formKey,  // Form for handling validation
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 30),
                   Text(
-                    'Join With Us',
+                    'Join With Us',  // Title of the screen
                     style: textTheme.titleLarge,
                   ),
                   const SizedBox(height: 24),
+                  // Email TextField
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter an email.';
+                        return 'Enter an email.';  // Email validation
                       }
                       return null;
                     },
@@ -62,11 +68,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12,
                   ),
+                  // First Name TextField
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter your first name';
+                        return 'Enter your first name';  // First Name validation
                       }
                       return null;
                     },
@@ -77,11 +84,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12,
                   ),
+                  // Last Name TextField
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter your last name';
+                        return 'Enter your last name';  // Last Name validation
                       }
                       return null;
                     },
@@ -92,11 +100,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12,
                   ),
+                  // Mobile Number TextField
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter your mobile number';
+                        return 'Enter your mobile number';  // Mobile validation
                       }
                       return null;
                     },
@@ -107,15 +116,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12,
                   ),
+                  // Password TextField
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter an password';
+                        return 'Enter a password';  // Password validation
                       }
-                      if(value!.length<6){
-                        return 'Enter a password more than 6 letters ';
-
+                      if(value!.length < 6) {
+                        return 'Enter a password more than 6 letters';  // Password length validation
                       }
                       return null;
                     },
@@ -125,17 +134,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12,
                   ),
+                  // SignUp Button with loading state
                   Visibility(
-                    visible: singUpInProgress==false,
-                    replacement: const Center(child: CircularProgressIndicator(),),
+                    visible: singUpInProgress == false,  // If not in progress, show button
+                    replacement: const Center(child: CircularProgressIndicator()),  // Show loading indicator if in progress
                     child: ElevatedButton(
-                      onPressed: _onTapSingUpButton,
+                      onPressed: _onTapSingUpButton,  // SignUp button tap action
                       child: const Icon(Icons.arrow_circle_right_outlined),
                     ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
+                  // Rich text for navigation to SignIn screen
                   Center(child: buildRichText())
                 ],
               ),
@@ -146,68 +157,70 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  // SignUp button tap handler
   void _onTapSingUpButton() {
     if (formKey.currentState!.validate()) {
-      ///code here
-      _singUp();
+      _singUp();  // Proceed with signup if validation passes
     }
   }
 
+  // Function to handle the signup API request
   Future<void> _singUp() async {
-    singUpInProgress=true;
-    setState(() {});
+    singUpInProgress = true;
+    setState(() {});  // Update UI to show progress
 
+    // Request body for signup API
     Map<String, dynamic> requestBody = {
       "email": emailTEController.text.trim(),
       "firstName": firstNameTEController.text.trim(),
       "lastName": lastNameTEController.text.trim(),
       "mobile": mobileTEController.text.trim(),
       "password": passwordTEController.text,
-      // "photo":""
     };
 
+    // Making the API call
     final NetworkResponse response = await NetworkCaller.postRequest(
         url: Urls.registrationUrl, body: requestBody);
-    singUpInProgress=false;
-    setState(() {});
 
-    if(response.isSuccess){
-      Mymessage('${firstNameTEController.text} Your Registration Compiled', context);
-      const Duration(
-        seconds: 2);
-      Navigator.pop(context);
+    singUpInProgress = false;
+    setState(() {});  // Update UI after the request
+
+    if(response.isSuccess) {
+      Mymessage('${firstNameTEController.text} Your Registration Completed', context);
+      const Duration(seconds: 2);  // Wait for 2 seconds before popping
+      Navigator.pop(context);  // Navigate back to the previous screen
+    } else {
+      Mymessage('Something went wrong! Please try again', context);  // Error message if signup fails
     }
-    else{
-      Mymessage('Something error! try again', context);
-    }
-
-
   } // _singUp End
 
+  // Rich text for SignIn navigation
   Widget buildRichText() {
     return RichText(
       text: TextSpan(
-          text: "have an account? ",
-          style: TextStyle(
-            color: AppColors.blackColor,
-            fontWeight: FontWeight.w600,
-          ),
-          children: [
-            TextSpan(
-                text: ' Sign in',
-                style: TextStyle(
-                  color: AppColors.themColor,
-                ),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    Navigator.pop(context);
-                  }),
-          ]),
+        text: "Already have an account? ",
+        style: TextStyle(
+          color: AppColors.blackColor,
+          fontWeight: FontWeight.w600,
+        ),
+        children: [
+          TextSpan(
+              text: 'Sign in',
+              style: TextStyle(
+                color: AppColors.themColor,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  Navigator.pop(context);  // Navigate to SignIn screen
+                }),
+        ],
+      ),
     );
   }
 
   @override
   void dispose() {
+    // Dispose of controllers to prevent memory leaks
     emailTEController.dispose();
     passwordTEController.dispose();
     firstNameTEController.dispose();

@@ -1,5 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:tast_manager/data/services/network_caller.dart';
+import 'package:tast_manager/data/utils/urls.dart';
 import 'package:tast_manager/ui/screen/forget_pass_pin_verification_screen.dart';
 import 'package:tast_manager/ui/screen/sign_in_screen.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
@@ -7,18 +9,24 @@ import 'package:tast_manager/widgets/show_snackber_message.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/background_screen.dart';
 
-class ForgetPassResetPasswordScreen extends StatefulWidget {
+/// Screen where the user can reset their password after verifying OTP.
+class RecoverResetPasswordScreen extends StatefulWidget {
   static String name = 'forget/pass/reset/password';
 
-  const ForgetPassResetPasswordScreen({super.key});
+  /// Constructor to pass [email] and [otp] for password reset.
+  const RecoverResetPasswordScreen(
+      {super.key, required this.email, required this.otp});
+
+  final String email;
+  final String otp;
 
   @override
-  State<ForgetPassResetPasswordScreen> createState() =>
-      _ForgetPassResetPasswordScreenState();
+  State<RecoverResetPasswordScreen> createState() =>
+      _RecoverResetPasswordScreenState();
 }
 
-class _ForgetPassResetPasswordScreenState
-    extends State<ForgetPassResetPasswordScreen> {
+class _RecoverResetPasswordScreenState
+    extends State<RecoverResetPasswordScreen> {
   TextEditingController passwordTEController = TextEditingController();
   TextEditingController confirmPasswordTEController = TextEditingController();
 
@@ -80,23 +88,20 @@ class _ForgetPassResetPasswordScreenState
                         keyboardType: TextInputType.visiblePassword,
                         controller: confirmPasswordTEController,
                         decoration:
-                            const InputDecoration(hintText: 'Confirm Password'),
+                        const InputDecoration(hintText: 'Confirm Password'),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: 12,
-                ),
+                const SizedBox(height: 12),
                 ElevatedButton(
                     onPressed: () {
                       if (formKey.currentState!.validate() &&
                           passwordTEController.text ==
                               confirmPasswordTEController.text) {
-                        Navigator.pushNamedAndRemoveUntil(context, SignInScreen.name, (route) => false,);
-                      }
-                      else{
-                        Mymessage('Password not match', context);
+                        _postResetPassword();
+                      } else {
+                        Mymessage('Passwords do not match', context);
                       }
                     },
                     child: const Text('Confirm')),
@@ -115,6 +120,7 @@ class _ForgetPassResetPasswordScreenState
     );
   }
 
+  /// Builds a rich text widget with a "Sign in" link.
   Widget buildRichText() {
     return RichText(
       text: TextSpan(
@@ -134,11 +140,39 @@ class _ForgetPassResetPasswordScreenState
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       SignInScreen.name,
-                      (route) => false,
+                          (route) => false,
                     );
                   }),
           ]),
     );
+  }
+
+  /// Sends the new password along with the OTP to reset the password.
+  Future<void> _postResetPassword() async {
+    Map<String, dynamic> requestBody = {
+      "email": widget.email,
+      "OTP": widget.otp,
+      "password": passwordTEController.text
+    };
+
+    NetworkResponse networkResponse =
+    await NetworkCaller.postRequest(
+        url: Urls.RecoverResetPassUrl, body: requestBody);
+
+    debugPrint('email=> ${widget.email}');
+    debugPrint('OTP=> ${widget.otp}');
+
+    if (networkResponse.statusData?['status'] == 'success') {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        SignInScreen.name,
+            (route) => false,
+      );
+
+      Mymessage('Password changed successfully.', context);
+    } else {
+      Mymessage('Request failed. Please try again!', context);
+    }
   }
 
   @override
