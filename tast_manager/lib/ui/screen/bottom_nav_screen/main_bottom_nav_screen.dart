@@ -17,10 +17,10 @@ class MainBottomNavScreen extends StatefulWidget {
 class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
   int _selectedIndex = 0;  // Tracks the selected index of the bottom navigation
   final List<Widget> _screen = [
-    NewTaskListScreen(),  // Screen for new tasks
-    ProgressTaskListScreen(),  // Screen for tasks in progress
-    CompletedTaskListScreen(),  // Screen for completed tasks
-    CanceledTaskListScreen()  // Screen for canceled tasks
+    const NewTaskListScreen(),  // Screen for new tasks
+    const ProgressTaskListScreen(),  // Screen for tasks in progress
+    const CompletedTaskListScreen(),  // Screen for completed tasks
+    const CanceledTaskListScreen()  // Screen for canceled tasks
   ];
 
   @override

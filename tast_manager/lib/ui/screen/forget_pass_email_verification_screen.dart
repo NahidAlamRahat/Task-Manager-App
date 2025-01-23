@@ -20,8 +20,8 @@ class ForgetPassEmailVerification extends StatefulWidget {
 
 class _ForgetPassEmailVerificationState
     extends State<ForgetPassEmailVerification> {
-  TextEditingController _emailTEController = TextEditingController(); // Controller for the email field
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Key for the form
+  final TextEditingController _emailTEController = TextEditingController(); // Controller for the email field
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Key for the form
 
   @override
   Widget build(BuildContext context) {

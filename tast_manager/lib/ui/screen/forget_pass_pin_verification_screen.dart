@@ -77,7 +77,7 @@ class _ForgetPassPinVerificationState extends State<ForgetPassPinVerification> {
                         selectedFillColor: Colors.white,
                         inactiveFillColor: Colors.white,
                       ),
-                      animationDuration: Duration(milliseconds: 300),
+                      animationDuration: const Duration(milliseconds: 300),
                       backgroundColor: Colors.transparent,
                       enableActiveFill: true,
                       controller: otpTEController,

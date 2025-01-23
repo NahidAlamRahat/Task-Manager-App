@@ -142,3 +142,4 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     super.dispose(); // Call dispose on the superclass
   }
 }
+

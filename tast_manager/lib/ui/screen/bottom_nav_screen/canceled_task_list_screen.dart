@@ -155,3 +155,4 @@ class _CanceledTaskListScreenState extends State<CanceledTaskListScreen> {
     setState(() {});
   }
 }
+

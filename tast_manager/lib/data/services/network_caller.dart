@@ -146,3 +146,4 @@ class NetworkCaller {
     debugPrint("User logged out and redirected to SignInScreen.");
   }
 }
+
