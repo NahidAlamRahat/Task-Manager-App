@@ -11,8 +11,10 @@ import 'package:tast_manager/widgets/task_item_widget.dart';
 import 'package:tast_manager/widgets/task_manager_app_bar.dart';
 import '../../../data/models/task_list_by_status_model.dart';
 
-// Canceled task list screen
+/// Canceled task list screen
 class CanceledTaskListScreen extends StatefulWidget {
+  static String name = 'canceled-task-screen';
+
   const CanceledTaskListScreen({super.key});
 
   @override
@@ -20,22 +22,20 @@ class CanceledTaskListScreen extends StatefulWidget {
 }
 
 class _CanceledTaskListScreenState extends State<CanceledTaskListScreen> {
-  bool _getTasksSummaryByStatusProgress = false;
+  bool _isLoadingData = false;
 
   TaskCountByStatusModel? taskCountByStatusModel;
   TaskListByStatusModel? taskListModel;
 
-  // Refresh both task count and task list
+  /// Refresh both task count and task list
   Future<void> _refreshAllData() async {
-    await _getTaskCountByStatus(isFromRefresh: true); // Refresh task count
-    await _getCanceledTaskListView(isFromRefresh: true); // Refresh canceled task list
+    await _getCanceledTaskListView(isFromRefresh: true);
   }
 
   @override
   void initState() {
     super.initState();
-    _getTaskCountByStatus(isFromRefresh: false); // Load task count initially
-    _getCanceledTaskListView(isFromRefresh: false); // Load canceled tasks initially
+    _getCanceledTaskListView(isFromRefresh: false);
   }
 
   @override
@@ -43,20 +43,46 @@ class _CanceledTaskListScreenState extends State<CanceledTaskListScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: TaskManagerAppBar(textTheme: textTheme), // App bar with custom theme
+      appBar: TaskManagerAppBar(textTheme: textTheme),
+
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, AddNewTaskScreen.name); // Navigate to Add New Task screen
+        onPressed: () async {
+          final result = await Navigator.pushNamed(context, AddNewTaskScreen.name);
+          if (result == true) {
+            // Rebuild the screen
+            setState(() {
+              _isLoadingData = true;
+            });
+            await _refreshAllData();
+          }
         },
-        child: const Icon(Icons.add), // Icon to add a new task
+        child: const Icon(Icons.add),
       ),
-      body: RefreshIndicator(
-        onRefresh: _refreshAllData, // Enable pull-to-refresh functionality
-        child: BackgroundScreen(
+
+      body: _isLoadingData ?
+      const Center(
+        child: CircularProgressIndicator(),
+      )
+          : RefreshIndicator(
+        onRefresh: _refreshAllData,
+        child: taskListModel?.taskList?.isNotEmpty == true ?
+        BackgroundScreen(
           child: Column(
             children: [
-              SizedBox(height: 100, child: _buildTasksSummaryByStatus()), // Task summary by status
-              _buildTaskListView(), // Canceled task list
+              _buildTaskListView(),
+            ],
+          ),
+        )
+            : BackgroundScreen(
+          child: Stack(
+            children: [
+              ListView(),
+              const Center(
+                child: Text(
+                  'Empty',
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                ),
+              ),
             ],
           ),
         ),
@@ -64,7 +90,7 @@ class _CanceledTaskListScreenState extends State<CanceledTaskListScreen> {
     );
   }
 
-  // Builds the list view of canceled tasks
+  /// Builds the list view of canceled tasks
   Widget _buildTaskListView() {
     return Expanded(
       child: Padding(
@@ -77,10 +103,10 @@ class _CanceledTaskListScreenState extends State<CanceledTaskListScreen> {
             itemCount: taskListModel?.taskList?.length ?? 0,
             itemBuilder: (context, index) {
               return TaskItemWidget(
-                color: const Color.fromRGBO(241, 80, 86, 1.0), // Red color for canceled tasks
-                taskModel: taskListModel?.taskList?[index], // Task data
-                status: 'Canceled', // Status label
-                showEditButton: false, // No edit button for canceled tasks
+                color: const Color.fromRGBO(241, 80, 86, 1.0),
+                taskModel: taskListModel?.taskList?[index],
+                status: 'Canceled',
+                showEditButton: false,
               );
             },
           ),
@@ -89,70 +115,24 @@ class _CanceledTaskListScreenState extends State<CanceledTaskListScreen> {
     );
   }
 
-  // Builds the summary of tasks by status (e.g., Canceled, Pending, etc.)
-  Widget _buildTasksSummaryByStatus() {
-    return Visibility(
-      visible: _getTasksSummaryByStatusProgress == false, // Show only when not loading
-      replacement: const Center(
-        child: CircularProgressIndicator(), // Show loading indicator while fetching data
-      ),
-      child: SizedBox(
-        height: 100,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal, // Horizontal scroll for status summary
-          itemCount: taskCountByStatusModel?.taskByStatusList?.length ?? 0,
-          itemBuilder: (context, index) {
-            final TaskCountModel model =
-            taskCountByStatusModel!.taskByStatusList![index];
-            return TaskStatusSummaryCounterWidget(
-              count: model.sum.toString(), // Display task count
-              title: model.sId ?? '', // Display task status name
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  // Fetch task count summary by status
-  Future<void> _getTaskCountByStatus({bool isFromRefresh = false}) async {
-    if (!isFromRefresh) {
-      _getTasksSummaryByStatusProgress = true; // Start loading
-      setState(() {});
-    }
-
-    NetworkResponse networkResponse =
-    await NetworkCaller.getRequest(url: Urls.taskStatusCountUrl); // Fetch task count
-
-    if (networkResponse.isSuccess) {
-      taskCountByStatusModel =
-          TaskCountByStatusModel.fromJson(networkResponse.statusData!); // Parse data
-    } else {
-      Mymessage(networkResponse.errorMessage, context); // Show error message
-    }
-    _getTasksSummaryByStatusProgress = false; // Stop loading
-    setState(() {});
-  }
-
-  // Fetch the list of canceled tasks
+  /// Fetch the list of canceled tasks
   Future<void> _getCanceledTaskListView({bool isFromRefresh = false}) async {
     if (!isFromRefresh) {
-      _getTasksSummaryByStatusProgress = true; // Start loading
+      _isLoadingData = true;
       setState(() {});
     }
 
     NetworkResponse networkResponse = await NetworkCaller.getRequest(
-      url: Urls.taskListByStatusUrl('Canceled'), // URL for canceled tasks
+      url: Urls.taskListByStatusUrl('Canceled'),
     );
 
     if (networkResponse.isSuccess) {
       taskListModel =
-          TaskListByStatusModel.fromJson(networkResponse.statusData!); // Parse task list
+          TaskListByStatusModel.fromJson(networkResponse.statusData!);
     } else {
-      Mymessage(networkResponse.errorMessage, context); // Show error message
+      Mymessage(networkResponse.errorMessage, context);
     }
-    _getTasksSummaryByStatusProgress = false; // Stop loading
+    _isLoadingData = false;
     setState(() {});
   }
 }
-

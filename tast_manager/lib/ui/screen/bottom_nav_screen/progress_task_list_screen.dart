@@ -12,8 +12,10 @@ import 'package:tast_manager/widgets/task_item_widget.dart';
 import 'package:tast_manager/widgets/task_manager_app_bar.dart';
 import '../../../data/models/task_list_by_status_model.dart';
 
-/// Screen displaying tasks in the "Progress" status, with summary of task counts.
+/// Screen displaying tasks in the "Progress" status,
 class ProgressTaskListScreen extends StatefulWidget {
+  static String name = 'progress-task-screen';
+
   const ProgressTaskListScreen({super.key});
 
   @override
@@ -21,24 +23,20 @@ class ProgressTaskListScreen extends StatefulWidget {
 }
 
 class _ProgressTaskListScreenState extends State<ProgressTaskListScreen> {
-  bool _getTasksSummaryByStatusProgress = false;  // Flag for showing loading progress
+  bool _isLoadingData = false;
 
-  TaskCountByStatusModel? taskCountByStatusModel;  // Holds task count by status
-  TaskListByStatusModel? taskListModel;  // Holds task list by status
-  TaskModel? taskModel;  // Placeholder for individual task model
+  TaskCountByStatusModel? taskCountByStatusModel;
+  TaskListByStatusModel? taskListModel;
+  TaskModel? taskModel;
 
-  /// Refreshes both task count and list views when pulling to refresh.
+  /// Refreshes both task count and list views
   Future<void> _refreshAllData() async {
-    // Refresh task count and task list without modifying loading state
-    await _getTaskCountByStatus(isFromRefresh: true);
     await _getCompletedTaskListView(isFromRefresh: true);
   }
 
   @override
   void initState() {
     super.initState();
-    // Initialize task count and task list by status
-    _getTaskCountByStatus(isFromRefresh: false);
     _getCompletedTaskListView(isFromRefresh: false);
   }
 
@@ -47,23 +45,46 @@ class _ProgressTaskListScreenState extends State<ProgressTaskListScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: TaskManagerAppBar(textTheme: textTheme),  // Custom app bar for task manager
+      appBar: TaskManagerAppBar(textTheme: textTheme),
+
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigates to the screen to add a new task
-          Navigator.pushNamed(context, AddNewTaskScreen.name);
+        onPressed: () async {
+          final result = await Navigator.pushNamed(context, AddNewTaskScreen.name);
+          if (result == true) {
+            // Rebuild the screen
+            setState(() {
+              _isLoadingData = true;
+            });
+            await _refreshAllData();
+          }
         },
-        child: const Icon(Icons.add),  // Icon for the floating action button
+        child: const Icon(Icons.add),
       ),
-      body: RefreshIndicator(
-        onRefresh: _refreshAllData,  // Enables pull-to-refresh functionality
-        child: BackgroundScreen(
+
+      body:  _isLoadingData ?
+      const Center(
+        child: CircularProgressIndicator(),
+      )
+          : RefreshIndicator(
+        onRefresh: _refreshAllData,
+        child: taskListModel?.taskList?.isNotEmpty == true ?
+        BackgroundScreen(
           child: Column(
             children: [
-              SizedBox(
-                  height: 100,
-                  child: _buildTasksSummaryByStatus()),  // Display task summary by status
-              _buildTaskListView(),  // Display list of tasks
+              _buildTaskListView(),
+            ],
+          ),
+        )
+            : BackgroundScreen(
+          child: Stack(
+            children: [
+              ListView(),
+              const Center(
+                child: Text(
+                  'Empty',
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                ),
+              ),
             ],
           ),
         ),
@@ -79,15 +100,15 @@ class _ProgressTaskListScreenState extends State<ProgressTaskListScreen> {
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: ListView.builder(
-            shrinkWrap: true,  // Prevents scrolling issues by limiting list size
+            shrinkWrap: true,
             primary: false,
-            itemCount: taskListModel?.taskList?.length ?? 0,  // Safely access task list length
+            itemCount: taskListModel?.taskList?.length ?? 0,
             itemBuilder: (context, index) {
               return TaskItemWidget(
-                color: const Color.fromRGBO(203, 12, 159, 1),  // Custom color for the task item widget
-                taskModel: taskListModel?.taskList?[index],  // Pass the task model for the individual task
-                status: 'Progress',  // Status of task
-                showEditButton: true,  // Show the edit button for each task
+                color: const Color.fromRGBO(203, 12, 159, 1),
+                taskModel: taskListModel?.taskList?[index],
+                status: 'Progress',
+                showEditButton: true,
               );
             },
           ),
@@ -96,52 +117,10 @@ class _ProgressTaskListScreenState extends State<ProgressTaskListScreen> {
     );
   }
 
-  /// Builds the summary of tasks by their status.
-  Widget _buildTasksSummaryByStatus() {
-    return Visibility(
-      visible: _getTasksSummaryByStatusProgress == false,  // Only show the summary when data is ready
-      replacement: const Center(child: CircularProgressIndicator()),  // Shows loading indicator while fetching data
-      child: SizedBox(
-        height: 100,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,  // Horizontal scrolling for the task status counters
-          itemCount: taskCountByStatusModel?.taskByStatusList?.length ?? 0,  // Safely access task count list
-          itemBuilder: (context, index) {
-            final TaskCountModel model = taskCountByStatusModel!.taskByStatusList![index];
-            return TaskStatusSummaryCounterWidget(
-              count: model.sum.toString(),  // Display the task count
-              title: model.sId ?? '',  // Display the task status
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  /// Fetches task count by status from the network and updates the state.
-  Future<void> _getTaskCountByStatus({bool isFromRefresh = false}) async {
-    if (!isFromRefresh) {
-      _getTasksSummaryByStatusProgress = true;  // Show progress indicator while fetching data
-      setState(() {});
-    }
-
-    NetworkResponse networkResponse =
-    await NetworkCaller.getRequest(url: Urls.taskStatusCountUrl);
-
-    if (networkResponse.isSuccess) {
-      taskCountByStatusModel = TaskCountByStatusModel.fromJson(networkResponse.statusData!);
-    } else {
-      Mymessage(networkResponse.errorMessage, context);  // Show error message if the request fails
-    }
-
-    _getTasksSummaryByStatusProgress = false;  // Hide progress indicator after the request completes
-    setState(() {});
-  }
-
-  /// Fetches tasks in "Progress" status from the network and updates the state.
+  /// Fetches tasks in "Progress" status from the network
   Future<void> _getCompletedTaskListView({bool isFromRefresh = false}) async {
     if (!isFromRefresh) {
-      _getTasksSummaryByStatusProgress = true;  // Show progress indicator while fetching data
+      _isLoadingData = true;
       setState(() {});
     }
 
@@ -151,10 +130,10 @@ class _ProgressTaskListScreenState extends State<ProgressTaskListScreen> {
     if (networkResponse.isSuccess) {
       taskListModel = TaskListByStatusModel.fromJson(networkResponse.statusData!);
     } else {
-      Mymessage(networkResponse.errorMessage, context);  // Show error message if the request fails
+      Mymessage(networkResponse.errorMessage, context);
     }
 
-    _getTasksSummaryByStatusProgress = false;  // Hide progress indicator after the request completes
+    _isLoadingData = false;
     setState(() {});
   }
-} // ProgressTaskListScreen end
+}

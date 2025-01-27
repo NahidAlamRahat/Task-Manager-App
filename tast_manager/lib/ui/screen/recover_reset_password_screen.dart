@@ -9,11 +9,9 @@ import 'package:tast_manager/widgets/show_snackber_message.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/background_screen.dart';
 
-/// Screen where the user can reset their password after verifying OTP.
 class RecoverResetPasswordScreen extends StatefulWidget {
   static String name = 'forget/pass/reset/password';
 
-  /// Constructor to pass [email] and [otp] for password reset.
   const RecoverResetPasswordScreen(
       {super.key, required this.email, required this.otp});
 
@@ -120,7 +118,7 @@ class _RecoverResetPasswordScreenState
     );
   }
 
-  /// Builds a rich text widget with a "Sign in" link.
+  /// Builds a rich text widget with a "Sign in".
   Widget buildRichText() {
     return RichText(
       text: TextSpan(
@@ -157,7 +155,7 @@ class _RecoverResetPasswordScreenState
 
     NetworkResponse networkResponse =
     await NetworkCaller.postRequest(
-        url: Urls.RecoverResetPassUrl, body: requestBody);
+        url: Urls.recoverResetPassUrl, body: requestBody);
 
     debugPrint('email=> ${widget.email}');
     debugPrint('OTP=> ${widget.otp}');

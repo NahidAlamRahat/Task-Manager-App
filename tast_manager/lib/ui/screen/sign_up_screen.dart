@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:tast_manager/data/services/network_caller.dart';
 import 'package:tast_manager/data/utils/urls.dart';
 import 'package:tast_manager/ui/screen/forget_pass_email_verification_screen.dart';
+import 'package:tast_manager/ui/screen/update_screen.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
 
 import '../../utils/app_colors.dart';
@@ -18,17 +22,14 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  // Controllers for text fields
   TextEditingController emailTEController = TextEditingController();
   TextEditingController passwordTEController = TextEditingController();
   TextEditingController firstNameTEController = TextEditingController();
   TextEditingController lastNameTEController = TextEditingController();
   TextEditingController mobileTEController = TextEditingController();
 
-  // Global key for form validation
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  // To manage the signup progress state
+  XFile? _imagePicker;
   bool singUpInProgress = false;
 
   @override
@@ -41,23 +42,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Form(
-              key: formKey,  // Form for handling validation
+              key: formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 30),
                   Text(
-                    'Join With Us',  // Title of the screen
+                    'Join With Us',
                     style: textTheme.titleLarge,
                   ),
                   const SizedBox(height: 24),
-                  // Email TextField
+                  _buildPhotoWidget(),
+                  SizedBox(height: 12,),
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter an email.';  // Email validation
+                        return 'Enter an email.';
                       }
                       return null;
                     },
@@ -68,12 +70,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12,
                   ),
-                  // First Name TextField
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter your first name';  // First Name validation
+                        return 'Enter your first name';
                       }
                       return null;
                     },
@@ -84,12 +85,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12,
                   ),
-                  // Last Name TextField
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter your last name';  // Last Name validation
+                        return 'Enter your last name';
                       }
                       return null;
                     },
@@ -100,12 +100,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12,
                   ),
-                  // Mobile Number TextField
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter your mobile number';  // Mobile validation
+                        return 'Enter your mobile number';
                       }
                       return null;
                     },
@@ -116,15 +115,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12,
                   ),
-                  // Password TextField
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
-                        return 'Enter a password';  // Password validation
+                        return 'Enter a password';
                       }
-                      if(value!.length < 6) {
-                        return 'Enter a password more than 6 letters';  // Password length validation
+                      if (value!.length < 6) {
+                        return 'Enter a password more than 6 letters';
                       }
                       return null;
                     },
@@ -134,19 +132,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12,
                   ),
-                  // SignUp Button with loading state
                   Visibility(
-                    visible: singUpInProgress == false,  // If not in progress, show button
-                    replacement: const Center(child: CircularProgressIndicator()),  // Show loading indicator if in progress
+                    visible: singUpInProgress == false,
+                    replacement:
+                        const Center(child: CircularProgressIndicator()),
                     child: ElevatedButton(
-                      onPressed: _onTapSingUpButton,  // SignUp button tap action
+                      onPressed: _onTapSingUpButton,
                       child: const Icon(Icons.arrow_circle_right_outlined),
                     ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  // Rich text for navigation to SignIn screen
                   Center(child: buildRichText())
                 ],
               ),
@@ -157,19 +154,75 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  // SignUp button tap handler
   void _onTapSingUpButton() {
     if (formKey.currentState!.validate()) {
-      _singUp();  // Proceed with signup if validation passes
+      _singUp();
     }
   }
 
-  // Function to handle the signup API request
+  Widget _buildPhotoWidget() {
+    return GestureDetector(
+      onTap: _getImagePicker,
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              height: 50,
+              decoration: const BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  bottomLeft: Radius.circular(8),
+                ),
+              ),
+              alignment: Alignment.center,
+              child: const Text(
+                'Photo',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+
+            Expanded(
+              child: Text(
+                _imagePicker == null ? 'No item selected' : _imagePicker!.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _getImagePicker() async {
+    final ImagePicker picker = ImagePicker();
+    XFile? image= await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      _imagePicker = image;
+      setState(() {});
+    }
+  }
+
   Future<void> _singUp() async {
     singUpInProgress = true;
-    setState(() {});  // Update UI to show progress
+    setState(() {});
 
-    // Request body for signup API
     Map<String, dynamic> requestBody = {
       "email": emailTEController.text.trim(),
       "firstName": firstNameTEController.text.trim(),
@@ -177,24 +230,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
       "mobile": mobileTEController.text.trim(),
       "password": passwordTEController.text,
     };
+    if(_imagePicker != null){
+      List<int> imageBytes = await _imagePicker!.readAsBytes();
+      requestBody["photo"]= base64Encode(imageBytes);
+    }
 
-    // Making the API call
     final NetworkResponse response = await NetworkCaller.postRequest(
         url: Urls.registrationUrl, body: requestBody);
 
     singUpInProgress = false;
-    setState(() {});  // Update UI after the request
+    setState(() {});
 
-    if(response.isSuccess) {
-      Mymessage('${firstNameTEController.text} Your Registration Completed', context);
-      const Duration(seconds: 2);  // Wait for 2 seconds before popping
-      Navigator.pop(context);  // Navigate back to the previous screen
+    if (response.isSuccess) {
+      Mymessage(
+          '${firstNameTEController.text} Your Registration Completed', context);
+      const Duration(seconds: 2);
+      Navigator.pop(context);
     } else {
-      Mymessage('Something went wrong! Please try again', context);  // Error message if signup fails
+      Mymessage('Something went wrong! Please try again', context);
     }
-  } // _singUp End
+  }
 
-  // Rich text for SignIn navigation
   Widget buildRichText() {
     return RichText(
       text: TextSpan(
@@ -211,7 +267,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  Navigator.pop(context);  // Navigate to SignIn screen
+                  Navigator.pop(context);
                 }),
         ],
       ),
@@ -220,7 +276,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void dispose() {
-    // Dispose of controllers to prevent memory leaks
     emailTEController.dispose();
     passwordTEController.dispose();
     firstNameTEController.dispose();

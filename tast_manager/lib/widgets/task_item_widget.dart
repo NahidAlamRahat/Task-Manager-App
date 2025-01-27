@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tast_manager/widgets/show_custom_alert_dialog_function.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
 
+import '../data/models/task_list_by_status_model.dart';
 import '../data/models/task_model.dart';
 import '../data/services/network_caller.dart';
 import '../data/utils/urls.dart';
@@ -9,75 +11,74 @@ import '../data/utils/urls.dart';
 class TaskItemWidget extends StatefulWidget {
   const TaskItemWidget({
     super.key,
-    required this.taskModel, // Represents the task data to be displayed
-    required this.color, // The color associated with the task's status
-    required this.status, // The current status of the task
-    required this.showEditButton, // Determines whether the edit button is shown
+    required this.taskModel,
+    required this.color,
+    required this.status,
+    required this.showEditButton,
   });
 
-  final TaskModel? taskModel; // Task model containing task data
-  final Color color; // Color to represent the task's status
-  final String status; // Task's current status
-  final bool showEditButton; // Flag to show or hide the edit button
+  final TaskModel? taskModel;
+  final Color color;
+  final String status;
+  final bool showEditButton;
 
   @override
   _TaskItemWidgetState createState() => _TaskItemWidgetState();
 }
 
+TaskListByStatusModel? taskListByStatusModel;
+
 class _TaskItemWidgetState extends State<TaskItemWidget> {
   @override
   Widget build(BuildContext context) {
-    // Builds the widget structure for displaying the task item
     return Card(
       child: ListTile(
-        title: Text(widget.taskModel?.title ?? 'empty'), // Displays the task title
+        title: Text(widget.taskModel?.title ?? 'empty'),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Displays the task description
             Text(
               widget.taskModel?.description ?? 'empty',
               style: const TextStyle(color: Colors.grey),
-              maxLines: 2, // Limits to two lines with ellipsis if overflowing
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            Text(widget.taskModel?.createdDate ?? 'empty'), // Displays the creation date
+            Text(widget.taskModel?.createdDate ?? 'empty'),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Displays a chip to show the task's status
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Chip(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20), // Rounded corners for the chip
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    label: Text(widget.status), // Status label
+                    label: Text(widget.status),
                     labelStyle: const TextStyle(
-                      color: Colors.white, // White text color
-                      fontSize: 16, // Font size
+                      color: Colors.white,
+                      fontSize: 16,
                     ),
-                    backgroundColor: widget.color, // Chip background color
+                    backgroundColor: widget.color,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 4, // Horizontal padding inside the chip
-                      vertical: 2, // Vertical padding inside the chip
+                      horizontal: 4,
+                      vertical: 2,
                     ),
                   ),
                 ),
-                // Row containing action buttons (delete and optionally edit)
                 Row(
                   children: [
-                    IconButton(
-                      onPressed: () {}, // Placeholder for delete functionality
-                      icon: const Icon(Icons.delete), // Delete icon
-                    ),
-                    if (widget.showEditButton) // Conditionally show the edit button
+                  IconButton(
+                   onPressed: () {
+                     _deletedItemAlertDialog();
+                    },
+                   icon: const Icon(Icons.delete)),
+
+                    if (widget.showEditButton) // Conditionally show edit button
                       IconButton(
                         onPressed: () {
-                          // Show a dialog for changing task status
                           _showChangeStatusDialog(id: widget.taskModel?.sId);
                         },
-                        icon: const Icon(Icons.edit), // Edit icon
+                        icon: const Icon(Icons.edit),
                       ),
                   ],
                 ),
@@ -89,15 +90,12 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
     );
   }
 
-  /// Shows a dialog to change the task's status.
   void _showChangeStatusDialog({required String? id}) {
     if (id == null) {
-      // Show an error message if the task ID is invalid
       Mymessage('Invalid Task ID', context);
       return;
     }
 
-    // Determine the available statuses based on the current task status
     List<String> availableStatuses = [];
     if (widget.status == 'New') {
       availableStatuses = ['Progress', 'Completed', 'Canceled'];
@@ -107,21 +105,20 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
       availableStatuses = ['Canceled'];
     }
 
-    // Show a dialog to select a new status
+    ///change status
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Change Status'), // Dialog title
+          title: const Text('Change Status'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              for (String status in availableStatuses) ...[ // List available statuses
-                const Divider(height: 0), // Divider between options
+              for (String status in availableStatuses) ...[
+                const Divider(height: 0),
                 ListTile(
-                  title: Text(status), // Status option text
+                  title: Text(status),
                   onTap: () {
-                    // Update the task status when an option is selected
                     _updateTodoStatus(id, status);
                   },
                 ),
@@ -133,23 +130,53 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
     );
   }
 
-  /// Updates the task's status by making a network request.
-  void _updateTodoStatus(String id, String status) async {
-    // Send a network request to update the status
+  _deletedItemAlertDialog(){
+    ShowCustomAlertDialog(context, text: const Text('Delete Task!'),
+        message: 'Are you sure you want to delete this task?',
+        onConfirm: (){
+      _getDeleteItem(id: widget.taskModel?.sId);
+      Navigator.pop(context,true);
+        }
+    );
+  }
+  
+  
+
+
+  /// Item Status Updated Method.
+  Future<void> _updateTodoStatus(String id, String status) async {
     NetworkResponse networkResponse = await NetworkCaller.getRequest(
       url: Urls.updateTaskStatusUrl(id, status),
     );
 
     if (networkResponse.isSuccess) {
-      // Show a success message and update the status locally
       Mymessage('Update successful', context);
       setState(() {
-        widget.taskModel?.status = status; // Update status locally
-        Navigator.pop(context); // Close the dialog
+        widget.taskModel?.status = status;
+        Navigator.pop(context);
       });
     } else {
-      // Show an error message if the update fails
       Mymessage(networkResponse.errorMessage, context);
     }
   }
+
+  /// Item Status Deleted Method.
+  Future<void> _getDeleteItem({required var id}) async{
+    NetworkResponse networkResponse = await NetworkCaller.getRequest(
+        url: Urls.deleteTaskUrl(id));
+    print('deleted id=> $id');
+    print('statusCode=> ${networkResponse.statusCode}');
+    print('errorMessage id=> ${networkResponse.errorMessage}');
+
+
+    if(networkResponse.isSuccess){
+      taskListByStatusModel?.taskList?.removeAt(id);
+      Mymessage('Delete Successfully', context);
+    }
+    else{
+      Mymessage('deleted error', context);
+    }
+  }
+
+  
 }

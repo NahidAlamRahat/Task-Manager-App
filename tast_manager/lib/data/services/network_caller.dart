@@ -7,10 +7,10 @@ import 'package:tast_manager/ui/screen/sign_in_screen.dart';
 
 /// Represents the response structure for network requests
 class NetworkResponse {
-  final bool isSuccess; // Indicates if the request was successful
-  final int statusCode; // HTTP status code of the response
-  late final Map<String, dynamic>? statusData; // Decoded JSON data from the response
-  final String? errorMessage; // Error message if the request fails
+  final bool isSuccess;
+  final int statusCode;
+  late final Map<String, dynamic>? statusData;
+  String? errorMessage;
 
   NetworkResponse({
     required this.statusCode,
@@ -20,10 +20,10 @@ class NetworkResponse {
   });
 }
 
-/// A utility class for making network requests
+
 class NetworkCaller {
-  /// Sends a GET request to the given [url].
-  /// [params] are optional query parameters.
+
+  /// Sends a GET request
   static Future<NetworkResponse> getRequest({
     required String url,
     Map<String, dynamic>? params,
@@ -39,24 +39,22 @@ class NetworkCaller {
       debugPrint('Status Code = ${response.statusCode}');
       debugPrint('Response Data = ${response.body}');
 
-      // Handle successful response
       if (response.statusCode == 200) {
-        return NetworkResponse(
-          statusCode: response.statusCode,
-          isSuccess: true,
-          statusData: jsonDecode(response.body), // Decode JSON response
-        );
-      }
-      // Handle unauthorized (401) response
-      else if (response.statusCode == 401) {
-        await _logOut(); // Log the user out and redirect to sign-in
         return NetworkResponse(
           statusCode: response.statusCode,
           isSuccess: true,
           statusData: jsonDecode(response.body),
         );
       }
-      // Handle other errors
+      // Handle unauthorized (401) response
+      else if (response.statusCode == 401) {
+        await _logOut();
+        return NetworkResponse(
+          statusCode: response.statusCode,
+          isSuccess: true,
+          statusData: jsonDecode(response.body),
+        );
+      }
       else {
         return NetworkResponse(
           statusCode: response.statusCode,
@@ -64,18 +62,16 @@ class NetworkCaller {
         );
       }
     } catch (e) {
-      // Handle request failure
       return NetworkResponse(
         statusCode: -1,
         isSuccess: false,
-        errorMessage: e.toString(), // Capture the error message
+        errorMessage: e.toString(),
       );
     }
   }
 
 
-  /// Sends a POST request to the given [url].
-  /// [body] is the request payload, which will be encoded as JSON.
+  /// Sends a POST request to the [url].
   static Future<NetworkResponse> postRequest({
     required String url,
     Map<String, dynamic>? body,
@@ -84,7 +80,6 @@ class NetworkCaller {
       Uri uri = Uri.parse(url); // Parse the URL
       debugPrint('URL = $url');
 
-      // Send POST request with JSON-encoded body and authorization token
       Response response = await post(
         uri,
         body: jsonEncode(body),
@@ -97,24 +92,23 @@ class NetworkCaller {
       debugPrint('Status Code = ${response.statusCode}');
       debugPrint('Response Data = ${response.body}');
 
-      // Handle successful response
+
       if (response.statusCode == 200) {
-        return NetworkResponse(
-          statusCode: response.statusCode,
-          isSuccess: true,
-          statusData: jsonDecode(response.body), // Decode JSON response
-        );
-      }
-      // Handle unauthorized (401) response
-      else if (response.statusCode == 401) {
-        await _logOut(); // Log the user out and redirect to sign-in
         return NetworkResponse(
           statusCode: response.statusCode,
           isSuccess: true,
           statusData: jsonDecode(response.body),
         );
       }
-      // Handle other errors
+      // Handle unauthorized (401) response
+      else if (response.statusCode == 401) {
+        await _logOut();
+        return NetworkResponse(
+          statusCode: response.statusCode,
+          isSuccess: true,
+          statusData: jsonDecode(response.body),
+        );
+      }
       else {
         return NetworkResponse(
           statusCode: response.statusCode,
@@ -122,28 +116,24 @@ class NetworkCaller {
         );
       }
     } catch (e) {
-      // Handle request failure
       return NetworkResponse(
         statusCode: -1,
         isSuccess: false,
-        errorMessage: e.toString(), // Capture the error message
+        errorMessage: e.toString(),
       );
     }
   }
 
-  /// Logs the user out and redirects to the sign-in screen.
+ /// [Token_expired] Logout the user and go to the sign-in screen.
   static Future<void> _logOut() async {
-    // Clear stored authentication data
+    // Clear data
     await AuthController.clearData();
-
-    // Redirect to SignInScreen
     Navigator.pushNamedAndRemoveUntil(
       TaskManager.navigatorKey.currentContext!,
       SignInScreen.name,
-          (route) => false, // Remove all previous routes
+          (route) => false,
     );
 
-    debugPrint("User logged out and redirected to SignInScreen.");
   }
 }
 

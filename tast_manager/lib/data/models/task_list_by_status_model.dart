@@ -1,32 +1,30 @@
 import 'package:tast_manager/data/models/task_model.dart';
 
-/// Represents a list of tasks grouped by a specific status
+/// Represents a list of tasks by a specific status
 class TaskListByStatusModel {
-  String? status; // The status/category of the tasks (e.g., "New", "Completed")
-  List<TaskModel>? taskList; // The list of tasks under this status
+  String? status;
+  List<TaskModel>? taskList;
 
-  /// Constructor to initialize with optional values
   TaskListByStatusModel({this.status, this.taskList});
 
-  /// Creates a TaskListByStatusModel object from JSON data
+  /// Json to Object
   TaskListByStatusModel.fromJson(Map<String, dynamic> json) {
-    status = json['status']; // Extract the task status from JSON
+    status = json['status'];
     if (json['data'] != null) {
-      taskList = <TaskModel>[]; // Initialize the task list
+      taskList = <TaskModel>[];
       json['data'].forEach((v) {
-        taskList!.add(TaskModel.fromJson(v)); // Add each task to the list
+        taskList!.add(TaskModel.fromJson(v));
       });
     }
   }
 
-  /// Converts this object to JSON format
+  /// Object to JSON
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['status'] = status; // Add the task status to JSON
+    data['status'] = status;
     if (taskList != null) {
-      data['data'] = taskList!.map((v) => v.toJson()).toList(); // Add tasks to JSON
+      data['data'] = taskList!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
-

@@ -15,10 +15,13 @@ class AuthController {
 
     // Save token
     await sharedPreferences.setString(_tokenKey, token);
-    accessToken= token;
+    accessToken = token; // Update static accessToken variable
+
     // Save user data as JSON string
     await sharedPreferences.setString(_userDataKey, jsonEncode(userData.toJson()));
+    userModel = userData; // Update static userModel variable
   }
+
 
   /// Retrieve user data and token from SharedPreferences
   static Future<void> getUserData() async {

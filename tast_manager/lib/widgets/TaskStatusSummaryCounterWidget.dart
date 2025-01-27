@@ -3,33 +3,29 @@ import 'package:flutter/material.dart';
 class TaskStatusSummaryCounterWidget extends StatelessWidget {
   const TaskStatusSummaryCounterWidget({
     super.key,
-    required this.count,  // Task count to display
-    required this.title,  // Title to describe the count (e.g., 'Completed', 'Pending')
+    required this.count,
+    required this.title,
   });
 
-  final String count;  // The number representing the count (e.g., number of tasks)
-  final String title;  // Title to describe what the count represents (e.g., task category)
+  final String count;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;  // Get the text theme from the current context
+    final textTheme = Theme.of(context).textTheme;
     return Card(
-      elevation: 0,  // Set elevation of the card to 0 (flat card)
+      elevation: 0,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),  // Set padding inside the card
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
         child: Column(
           children: [
             Text(
-              count,  // Display the task count
-              style: textTheme.titleLarge?.copyWith(
-                // Customize the style of the count (no specific changes made)
-              ),
+              count,
+              style: textTheme.titleLarge?.copyWith(),
             ),
             Text(
-              title,  // Display the title (e.g., 'Completed', 'Pending')
-              style: textTheme.titleSmall?.copyWith(
-                  color: Colors.grey  // Set the title color to grey
-              ),
+              title,
+              style: textTheme.titleSmall?.copyWith(color: Colors.grey),
             ),
           ],
         ),

@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tast_manager/ui/screen/bottom_nav_screen/main_bottom_nav_screen.dart';
+import 'package:tast_manager/ui/screen/bottom_nav_screen/new_task_list_screen.dart';
 
 import '../../data/services/network_caller.dart';
 import '../../data/utils/urls.dart';
@@ -17,17 +19,17 @@ class AddNewTaskScreen extends StatefulWidget {
 }
 
 class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
-  TextEditingController _tiitleTEController = TextEditingController(); // Controller for the task title
-  TextEditingController _descriptionTEController = TextEditingController(); // Controller for the task description
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Key to manage form state
-  bool _newTaskAddedInProgress = false; // To show/hide progress indicator while adding task
+  final TextEditingController _titleTEController = TextEditingController();
+  final TextEditingController _descriptionTEController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _newTaskAddedInProgress = false;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: TaskManagerAppBar(textTheme: textTheme), // Custom app bar
+      appBar: TaskManagerAppBar(textTheme: textTheme),
       body: BackgroundScreen(
         child: SingleChildScrollView(
           child: Padding(
@@ -39,55 +41,52 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                 const SizedBox(height: 100),
                 Text(
                   'Add New Task',
-                  style: textTheme.titleLarge, // Style for the title
+                  style: textTheme.titleLarge,
                 ),
                 const SizedBox(height: 24),
                 Form(
-                  key: _formKey, // Attach form key for validation
+                  key: _formKey,
                   child: Column(
                     children: [
-                      // Title input field
                       TextFormField(
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
                           if (value?.trim().isEmpty ?? true) {
-                            return 'Enter a subject'; // Validation for empty title
+                            return 'Enter a subject';
                           }
                           return null;
                         },
-                        keyboardType: TextInputType.text, // Adjust keyboard type
-                        controller: _tiitleTEController, // Controller for title field
-                        decoration: const InputDecoration(hintText: 'Subject'), // Field decoration
+                        keyboardType: TextInputType.text,
+                        controller: _titleTEController,
+                        decoration: const InputDecoration(hintText: 'Subject'),
                       ),
                       const SizedBox(height: 12),
-                      // Description input field
                       TextFormField(
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
                           if (value?.trim().isEmpty ?? true) {
-                            return 'Enter a Description'; // Validation for empty description
+                            return 'Enter a Description';
                           }
                           return null;
                         },
-                        controller: _descriptionTEController, // Controller for description field
-                        decoration: const InputDecoration(hintText: 'Description'), // Field decoration
-                        maxLines: 6, // Allow multiple lines for description
+                        controller: _descriptionTEController,
+                        decoration: const InputDecoration(hintText: 'Description'),
+                        maxLines: 6,
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 12),
-                // Task add button or loading indicator based on progress
                 Visibility(
                   visible: _newTaskAddedInProgress == false,
-                  replacement: const Center(child: CircularProgressIndicator()), // Show loading indicator when in progress
+                  replacement: const Center(child: CircularProgressIndicator()),
                   child: ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) { // Validate form fields
-                        _addNewTaskItem(); // Proceed with task creation
+                      if (_formKey.currentState!.validate()) {
+                        _addNewTaskItem();
                       }
                     },
-                    child: const Icon(Icons.arrow_circle_right_outlined), // Button icon
+                    child: const Icon(Icons.arrow_circle_right_outlined),
                   ),
                 ),
               ],
@@ -98,48 +97,42 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     );
   }
 
-  /// Function to add a new task item by sending a POST request to the server
   Future<void> _addNewTaskItem() async {
     _newTaskAddedInProgress = true;
-    setState(() {}); // Update state to show loading indicator
+    setState(() {});
 
-    // Prepare the request body with task data
     Map<String, dynamic> requestBody = {
-      "title": _tiitleTEController.text.trim(),
+      "title": _titleTEController.text.trim(),
       "description": _descriptionTEController.text.trim(),
-      "status": "New", // Default task status is "New"
+      "status": "New",
     };
 
-    // Send POST request to the server
     final NetworkResponse networkResponse = await NetworkCaller.postRequest(
         url: Urls.createTaskUrl, body: requestBody);
 
     _newTaskAddedInProgress = false;
-    setState(() {}); // Hide loading indicator after the request is done
+    setState(() {});
 
-    // Handle success or failure based on the response
     if (networkResponse.isSuccess) {
-      _clearData(); // Clear the input fields after task creation
-      Mymessage('New Task Added', context); // Show success message
+      _clearData();
+      Mymessage('New Task Added', context);
+      Navigator.pop(context,true);
     } else {
-      debugPrint(networkResponse.errorMessage); // Log error message
-      debugPrint(networkResponse.statusCode.toString()); // Log status code
-      Mymessage('Added field', context); // Show failure message
+      debugPrint(networkResponse.errorMessage);
+      debugPrint(networkResponse.statusCode.toString());
+      Mymessage('Added field', context);
     }
   }
 
-  // Function to clear the input fields after task creation
   void _clearData() {
-    _tiitleTEController.clear();
+    _titleTEController.clear();
     _descriptionTEController.clear();
   }
 
-  // Dispose method to clean up controllers when the screen is removed
   @override
   void dispose() {
-    _tiitleTEController.dispose(); // Dispose the title controller
-    _descriptionTEController.dispose(); // Dispose the description controller
-    super.dispose(); // Call dispose on the superclass
+    _titleTEController.dispose();
+    _descriptionTEController.dispose();
+    super.dispose();
   }
 }
-

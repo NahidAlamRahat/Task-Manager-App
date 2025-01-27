@@ -7,7 +7,6 @@ import '../../data/utils/urls.dart';
 import '../../widgets/background_screen.dart';
 import '../../widgets/show_snackber_message.dart';
 
-/// This class handles the pin verification process during the password recovery flow.
 class ForgetPassPinVerification extends StatefulWidget {
   static String name = 'forget/pass/pin/verification';
 
@@ -27,8 +26,7 @@ class _ForgetPassPinVerificationState extends State<ForgetPassPinVerification> {
   TextEditingController otpTEController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  /// Builds the UI for the Pin Code input field.
-  /// Ensures that the user can input a 6-digit OTP for verification.
+  /// input a 6-digit OTP for verification.
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
