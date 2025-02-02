@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:tast_manager/data/models/user_data.dart';
 import 'package:tast_manager/data/services/network_caller.dart';
 import 'package:tast_manager/data/utils/urls.dart';
@@ -110,8 +112,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8))),
                         onPressed: () {
-                          Navigator.pushNamed(
-                              context, ForgetPassEmailVerification.name);
+                          Get.toNamed(ForgetPassEmailVerification.name);
                         },
                         child: const Text('Forget password'),
                       ),
@@ -146,7 +147,7 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.pushNamed(context, SignUpScreen.name);
+                Get.toNamed(SignUpScreen.name);
               },
           ),
         ],
@@ -186,7 +187,7 @@ class _SignInScreenState extends State<SignInScreen> {
         await AuthController.saveData(token, userData);
         Mymessage('LogIn Success', context);
         print('email=> ${userData.email}');
-        Navigator.pushReplacementNamed(context, MainBottomNavScreen.name);
+        Get.offAllNamed( MainBottomNavScreen.name);
       } else {
         Mymessage('Email/Password Invalid. Please try again!', context);
       }

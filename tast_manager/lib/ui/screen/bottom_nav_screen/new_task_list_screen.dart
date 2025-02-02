@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:tast_manager/data/models/task_count_by_status_model.dart';
 import 'package:tast_manager/data/models/task_count_model.dart';
 import 'package:tast_manager/data/services/network_caller.dart';
@@ -52,7 +54,7 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
       floatingActionButton: FloatingActionButton(
         mini: true,
         onPressed: () async {
-         final result = await Navigator.pushNamed(context, AddNewTaskScreen.name);
+         final result = await Get.toNamed(AddNewTaskScreen.name);
           if (result == true) {
             // Rebuild the screen
               _isLoadingDataProgress = true;

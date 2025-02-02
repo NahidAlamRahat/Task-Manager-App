@@ -1,8 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:tast_manager/data/services/network_caller.dart';
 import 'package:tast_manager/data/utils/urls.dart';
-import 'package:tast_manager/ui/screen/forget_pass_pin_verification_screen.dart';
 import 'package:tast_manager/ui/screen/sign_in_screen.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
 
@@ -135,8 +136,7 @@ class _RecoverResetPasswordScreenState
                 ),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
+                    Get.offNamedUntil(
                       SignInScreen.name,
                           (route) => false,
                     );
@@ -161,8 +161,7 @@ class _RecoverResetPasswordScreenState
     debugPrint('OTP=> ${widget.otp}');
 
     if (networkResponse.statusData?['status'] == 'success') {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
+      Get.offNamedUntil(
         SignInScreen.name,
             (route) => false,
       );

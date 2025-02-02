@@ -1,5 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:tast_manager/ui/screen/forget_pass_pin_verification_screen.dart';
 
 import '../../data/services/network_caller.dart';
@@ -102,11 +104,11 @@ class _ForgetPassEmailVerificationState
 
   Future<void> _emailVerification() async {
     NetworkResponse networkResponse = await NetworkCaller.getRequest(
-        url: Urls.recoverVerifyEmailUrl(_emailTEController.text));
+        url: Urls.recoverVerifyEmailUrl(_emailTEController.text.trim()));
 
     if (networkResponse.isSuccess) {
       Mymessage('Check your email', context);
-      Navigator.pushNamed(context, ForgetPassPinVerification.name,
+      Get.toNamed( ForgetPassPinVerification.name,
           arguments: _emailTEController.text.trim());
     } else {
       Mymessage(networkResponse.errorMessage, context);

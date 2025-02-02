@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:tast_manager/ui/screen/recover_reset_password_screen.dart';
 import '../../data/services/network_caller.dart';
@@ -105,8 +107,7 @@ class _ForgetPassPinVerificationState extends State<ForgetPassPinVerification> {
         url: Urls.recoverVerifyOTP(widget.email, otpTEController.text));
 
     if (networkResponse.statusData?['status'] == 'success') {
-      Navigator.pushNamed(
-          context,
+     Get.toNamed(
           arguments: {'otp': otpTEController.text, 'email': widget.email},
           RecoverResetPasswordScreen.name);
     } else {

@@ -6,7 +6,6 @@ import 'package:tast_manager/data/models/user_data.dart';
 import 'package:tast_manager/data/services/network_caller.dart';
 import 'package:tast_manager/data/utils/urls.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
-import 'package:tast_manager/ui/screen/splash_screen.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
 import 'package:tast_manager/widgets/task_manager_app_bar.dart';
 import '../../widgets/background_screen.dart';

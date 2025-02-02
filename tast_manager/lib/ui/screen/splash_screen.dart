@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
 import 'package:tast_manager/ui/screen/bottom_nav_screen/main_bottom_nav_screen.dart';
 import 'package:tast_manager/ui/screen/sign_in_screen.dart';
@@ -45,9 +47,9 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 4));
     bool userLoggedIn = await AuthController.userLoggedIn();
     if (userLoggedIn) {
-      Navigator.pushReplacementNamed(context, MainBottomNavScreen.name);
+      Get.offNamed( MainBottomNavScreen.name);
     } else {
-      Navigator.pushReplacementNamed(context, SignInScreen.name);
+      Get.offNamed(SignInScreen.name);
     }
   }
 

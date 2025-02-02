@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:tast_manager/data/models/task_count_by_status_model.dart';
-import 'package:tast_manager/data/models/task_count_model.dart';
 import 'package:tast_manager/data/services/network_caller.dart';
 import 'package:tast_manager/data/utils/urls.dart';
 import 'package:tast_manager/ui/screen/add_new_task_screen.dart';
-import 'package:tast_manager/widgets/TaskStatusSummaryCounterWidget.dart';
 import 'package:tast_manager/widgets/background_screen.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
 import 'package:tast_manager/widgets/task_item_widget.dart';
@@ -46,8 +45,9 @@ class _CanceledTaskListScreenState extends State<CanceledTaskListScreen> {
       appBar: TaskManagerAppBar(textTheme: textTheme),
 
       floatingActionButton: FloatingActionButton(
+        mini: true,
         onPressed: () async {
-          final result = await Navigator.pushNamed(context, AddNewTaskScreen.name);
+          final result = await Get.toNamed(AddNewTaskScreen.name);
           if (result == true) {
             // Rebuild the screen
             setState(() {

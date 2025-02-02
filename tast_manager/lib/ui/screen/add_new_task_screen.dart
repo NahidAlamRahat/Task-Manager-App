@@ -1,8 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tast_manager/ui/screen/bottom_nav_screen/main_bottom_nav_screen.dart';
-import 'package:tast_manager/ui/screen/bottom_nav_screen/new_task_list_screen.dart';
-
+import 'package:get/get.dart';
 import '../../data/services/network_caller.dart';
 import '../../data/utils/urls.dart';
 import '../../widgets/background_screen.dart';
@@ -116,7 +113,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     if (networkResponse.isSuccess) {
       _clearData();
       Mymessage('New Task Added', context);
-      Navigator.pop(context,true);
+      Get.off(true);
     } else {
       debugPrint(networkResponse.errorMessage);
       debugPrint(networkResponse.statusCode.toString());
