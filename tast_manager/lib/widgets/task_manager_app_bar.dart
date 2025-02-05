@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
+import 'package:tast_manager/ui/controllers/update_profile_controller.dart';
 import 'package:tast_manager/ui/screen/sign_in_screen.dart';
 import 'package:tast_manager/ui/screen/update_screen.dart';
 import 'package:tast_manager/widgets/show_custom_alert_dialog_function.dart';
@@ -63,25 +65,31 @@ class _TaskManagerAppBarState extends State<TaskManagerAppBar> {
           Expanded(
             child: GestureDetector(
               onTap: () async {
-                if (!widget.fromUpdateProfile) {
+                Navigator.pushNamed(context, UpdateScreen.name);
+               /* if (!widget.fromUpdateProfile) {
                   final result = await Navigator.pushNamed(context, UpdateScreen.name);
                   if (result == true) {
                     await _refreshUserData(); // Refresh data on update
                   }
-                }
+                }*/
               },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(
-                    AuthController.userModel?.fullName ?? 'Unknown User',
-                    style: widget.textTheme.titleLarge?.copyWith(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  GetBuilder<UpdateProfileController>(
+                    builder: (controller) {
+                      return Text(
+                        AuthController.userModel?.fullName ?? 'Unknown User',
+                        style: widget.textTheme.titleLarge?.copyWith(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      );
+                    }
                   ),
+
                   Text(
                     AuthController.userModel?.email ?? 'Unknown Email',
                     style: widget.textTheme.titleSmall?.copyWith(

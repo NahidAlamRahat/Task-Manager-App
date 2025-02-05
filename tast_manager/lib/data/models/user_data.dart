@@ -1,4 +1,5 @@
-class UserData {
+
+class UserData{
   String? email;
   String? firstName;
   String? lastName;

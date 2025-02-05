@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:tast_manager/data/models/user_data.dart';
 import 'package:tast_manager/data/services/network_caller.dart';
 import 'package:tast_manager/data/utils/urls.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
+import 'package:tast_manager/ui/controllers/sign_in_controller.dart';
 import 'package:tast_manager/ui/screen/bottom_nav_screen/main_bottom_nav_screen.dart';
 import 'package:tast_manager/ui/screen/forget_pass_email_verification_screen.dart';
 import 'package:tast_manager/ui/screen/sign_up_screen.dart';
@@ -24,12 +24,11 @@ class SignInScreen extends StatefulWidget {
   State<SignInScreen> createState() => _SignInScreenState();
 }
 
-bool _signInProgress = false;
-
 class _SignInScreenState extends State<SignInScreen> {
   TextEditingController emailTEController = TextEditingController();
   TextEditingController passwordTEController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+ final SignInController _signInController = Get.find<SignInController>();
 
   @override
   Widget build(BuildContext context) {
@@ -85,22 +84,22 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Visibility(
-                  visible: _signInProgress == false,
-                  replacement: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (formKey.currentState!.validate()) {
-                        setState(() {
-                          logInRequest();
-                        });
-                      }
-                    },
-                    child: const Icon(Icons.arrow_circle_right_outlined),
-                  ),
-                ),
+                GetBuilder<SignInController>(builder: (controller) {
+                  return Visibility(
+                    visible: controller.signInProgress == false,
+                    replacement: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                            logInRequest();
+                        }
+                      },
+                      child: const Icon(Icons.arrow_circle_right_outlined),
+                    ),
+                  );
+                }),
                 const SizedBox(
                   height: 20,
                 ),
@@ -156,41 +155,15 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> logInRequest() async {
-    _signInProgress = true;
-    setState(() {});
+    final bool isSuccess = await _signInController.logInRequest(
+        emailTEController.text.trim(), passwordTEController.text);
 
-    Map<String, dynamic> requestLogInBody = {
-      "email": emailTEController.text.trim(),
-      "password": passwordTEController.text,
-    };
+    if (isSuccess) {
+      Mymessage(_signInController.message, context);
+      Get.offAllNamed(MainBottomNavScreen.name);
+    } else {
+      Mymessage(_signInController.message, context);
 
-    final NetworkResponse response =
-    await NetworkCaller.postRequest(url: Urls.loginUrl, body: requestLogInBody);
-
-    _signInProgress = false;
-    setState(() {});
-
-    if (response.isSuccess) {
-      if (response.statusData is String) {
-        try {
-          response.statusData = jsonDecode(response.statusData as String);
-        } catch (e) {
-          Mymessage('Unexpected response from server.', context);
-          return;
-        }
-      }
-
-      String? token = response.statusData?['token'];
-      UserData? userData = UserData.fromJson(response.statusData?['data'] ?? {});
-
-      if (token != null) {
-        await AuthController.saveData(token, userData);
-        Mymessage('LogIn Success', context);
-        print('email=> ${userData.email}');
-        Get.offAllNamed( MainBottomNavScreen.name);
-      } else {
-        Mymessage('Email/Password Invalid. Please try again!', context);
-      }
     }
   }
 

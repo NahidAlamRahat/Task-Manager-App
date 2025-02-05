@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tast_manager/data/models/task_list_by_status_model.dart';
 import 'package:tast_manager/data/models/user_data.dart';
 import 'package:tast_manager/data/services/network_caller.dart';
 import 'package:tast_manager/data/utils/urls.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
+import 'package:tast_manager/ui/controllers/update_profile_controller.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
 import 'package:tast_manager/widgets/task_manager_app_bar.dart';
 import '../../widgets/background_screen.dart';
@@ -26,7 +29,8 @@ class _UpdateScreenState extends State<UpdateScreen> {
   TextEditingController lastNameTEController = TextEditingController();
   TextEditingController mobileTEController = TextEditingController();
   TextEditingController imageTEController = TextEditingController();
-  bool _isLoadingDataProgress = false;
+  final UpdateProfileController _updateProfileController = Get.put(UpdateProfileController());
+
 
   XFile? _imagePicker;
   TaskListByStatusModel? taskListModel;
@@ -147,7 +151,9 @@ class _UpdateScreenState extends State<UpdateScreen> {
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
-                    onPressed: _isLoadingDataProgress ? null : _UpdateProfile,
+                    onPressed:(){
+                      _UpdateProfile();
+                    },
                     child: const Text('Update Profile'),
                   ),
                 ],
@@ -218,10 +224,15 @@ class _UpdateScreenState extends State<UpdateScreen> {
   }
 
   Future<void> _UpdateProfile() async {
-    _isLoadingDataProgress = true;
-    setState(() {});
 
-    // Prepare the request body with updated profile data
+    bool isSuccess = await _updateProfileController.updateProfile(
+        firstNameTEController.text.trim(),
+        lastNameTEController.text.trim(),
+        mobileTEController.text.trim(),
+        // imageTEController.text.trim(),
+        passwordTEController.text);
+
+   /* // Prepare the request body with updated profile data
     Map<String, dynamic> requestBody = {
       "firstName": firstNameTEController.text.trim(),
       "lastName": lastNameTEController.text.trim(),
@@ -248,23 +259,23 @@ class _UpdateScreenState extends State<UpdateScreen> {
 
     _isLoadingDataProgress = false;
     setState(() {});
+*/
+    // if (networkResponse.isSuccess && networkResponse.statusData!.isNotEmpty) {
+    //   try {
+    //     final Map<String, dynamic> responseData = networkResponse.statusData?['data'] ?? {};
 
-    if (networkResponse.isSuccess && networkResponse.statusData!.isNotEmpty) {
-      try {
-        final Map<String, dynamic> responseData = networkResponse.statusData?['data'] ?? {};
-
-        if (responseData.isNotEmpty) {
-          UserData updatedUserData = UserData.fromJson({
+        if (isSuccess) {
+         /* UserData updatedUserData = UserData.fromJson({
             "email": AuthController.userModel?.email,
             "firstName": responseData['firstName'] ?? AuthController.userModel?.firstName,
             "lastName": responseData['lastName'] ?? AuthController.userModel?.lastName,
             "mobile": responseData['mobile'] ?? AuthController.userModel?.mobile,
             "photo": responseData['photo'] ?? AuthController.userModel?.photo,
           });
+*/
+          // await AuthController.saveData(AuthController.accessToken!, updatedUserData);
 
-          await AuthController.saveData(AuthController.accessToken!, updatedUserData);
-
-          Mymessage('Profile updated successfully', context);
+          Mymessage(_updateProfileController.message, context);
 
           print('Updated User Data:');
           print('Email: ${AuthController.userModel?.email}');
@@ -273,14 +284,9 @@ class _UpdateScreenState extends State<UpdateScreen> {
           print('Mobile: ${AuthController.userModel?.mobile}');
           print('Photo: ${AuthController.userModel?.photo}');
         } else {
-          Mymessage('No data returned from server.', context);
+          Mymessage(_updateProfileController.message, context);
         }
-      } catch (e) {
-        Mymessage('Unexpected response from server.', context);
-      }
-    } else {
-      Mymessage('Failed to update profile. Please try again.', context);
-    }
+
   }
 
   @override

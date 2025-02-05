@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:tast_manager/controller_binder.dart';
 import 'package:tast_manager/ui/screen/add_new_task_screen.dart';
 import 'package:tast_manager/ui/screen/bottom_nav_screen/main_bottom_nav_screen.dart';
 import 'package:tast_manager/ui/screen/forget_pass_email_verification_screen.dart';
@@ -22,6 +23,7 @@ class TaskManager extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      initialBinding: ControllerBinder(),
       debugShowCheckedModeBanner: false,
 
       theme: ThemeData(
