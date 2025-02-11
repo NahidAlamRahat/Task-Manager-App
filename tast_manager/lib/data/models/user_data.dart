@@ -1,5 +1,8 @@
 
-class UserData{
+import 'package:get/get.dart';
+import 'package:http/http.dart';
+
+class UserData {
   String? email;
   String? firstName;
   String? lastName;
@@ -7,7 +10,7 @@ class UserData{
   String? photo;
 
   /// full name
-  String? get fullName => '$firstName $lastName';
+  String get fullName=> '$firstName $lastName';
 
   /// Constructor to create a UserData object from JSON
   UserData.fromJson(Map<String, dynamic> json) {

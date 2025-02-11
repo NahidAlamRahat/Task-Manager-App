@@ -6,8 +6,9 @@ import 'new_task_list_screen.dart';
 
 class MainBottomNavScreen extends StatefulWidget {
   static String name = '/home';
+  final int initialIndex;
 
-  const MainBottomNavScreen({super.key});
+  const MainBottomNavScreen({super.key , this.initialIndex=0});
 
   @override
   State<MainBottomNavScreen> createState() => _MainBottomNavScreenState();
@@ -15,6 +16,13 @@ class MainBottomNavScreen extends StatefulWidget {
 
 class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
   int _selectedIndex = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _selectedIndex=widget.initialIndex;
+  }
+
   final List<Widget> _screen = [
     const NewTaskListScreen(),
     const ProgressTaskListScreen(),
@@ -22,11 +30,12 @@ class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
     const CanceledTaskListScreen()
   ];
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screen[_selectedIndex],
-      bottomNavigationBar: NavigationBar(
+       bottomNavigationBar: NavigationBar(
           selectedIndex: _selectedIndex,
           onDestinationSelected: (int index) {
             _selectedIndex = index;

@@ -1,16 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tast_manager/data/models/task_count_by_status_model.dart';
-import 'package:tast_manager/data/services/network_caller.dart';
-import 'package:tast_manager/data/utils/urls.dart';
+import 'package:tast_manager/ui/controllers/get_task_list_controller.dart';
 import 'package:tast_manager/ui/screen/add_new_task_screen.dart';
 import 'package:tast_manager/widgets/background_screen.dart';
+import 'package:tast_manager/widgets/build_task_List_view.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
-import 'package:tast_manager/widgets/task_item_widget.dart';
 import 'package:tast_manager/widgets/task_manager_app_bar.dart';
-import '../../../data/models/task_list_by_status_model.dart';
 
-/// Canceled task list screen
 class CanceledTaskListScreen extends StatefulWidget {
   static String name = 'canceled-task-screen';
 
@@ -21,15 +18,7 @@ class CanceledTaskListScreen extends StatefulWidget {
 }
 
 class _CanceledTaskListScreenState extends State<CanceledTaskListScreen> {
-  bool _isLoadingData = false;
-
-  TaskCountByStatusModel? taskCountByStatusModel;
-  TaskListByStatusModel? taskListModel;
-
-  /// Refresh both task count and task list
-  Future<void> _refreshAllData() async {
-    await _getCanceledTaskListView(isFromRefresh: true);
-  }
+  final GetTaskListController _getTaskListController = Get.find<GetTaskListController>();
 
   @override
   void initState() {
@@ -49,90 +38,75 @@ class _CanceledTaskListScreenState extends State<CanceledTaskListScreen> {
         onPressed: () async {
           final result = await Get.toNamed(AddNewTaskScreen.name);
           if (result == true) {
-            // Rebuild the screen
-            setState(() {
-              _isLoadingData = true;
-            });
             await _refreshAllData();
           }
         },
         child: const Icon(Icons.add),
       ),
 
-      body: _isLoadingData ?
-      const Center(
-        child: CircularProgressIndicator(),
-      )
-          : RefreshIndicator(
+      body: RefreshIndicator(
         onRefresh: _refreshAllData,
-        child: taskListModel?.taskList?.isNotEmpty == true ?
-        BackgroundScreen(
-          child: Column(
-            children: [
-              _buildTaskListView(),
-            ],
-          ),
-        )
-            : BackgroundScreen(
-          child: Stack(
-            children: [
-              ListView(),
-              const Center(
-                child: Text(
-                  'Empty',
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Builds the list view of canceled tasks
-  Widget _buildTaskListView() {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: ListView.builder(
-            shrinkWrap: true,
-            primary: false,
-            itemCount: taskListModel?.taskList?.length ?? 0,
-            itemBuilder: (context, index) {
-              return TaskItemWidget(
-                color: const Color.fromRGBO(241, 80, 86, 1.0),
-                taskModel: taskListModel?.taskList?[index],
-                status: 'Canceled',
-                showEditButton: false,
+        child: GetBuilder<GetTaskListController>(
+          builder: (controller) {
+            if (controller.isLoadingDataProgress) {
+              return const Center(
+                child: CircularProgressIndicator(),
               );
-            },
-          ),
+            }
+
+            // Jodi task list khali thake
+            if (controller.taskListModel.isEmpty) {
+              return BackgroundScreen(
+                child: Stack(
+                  children: [
+                    ListView(),
+                    const Center(
+                      child: Text(
+                        'Empty',
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            // Task list show korar jonno
+            return BackgroundScreen(
+              child: Column(
+                children: [
+                  BuildTaskListView.buildTaskListView(
+                      taskList: controller.taskListModel,
+                      status: 'Canceled',
+                      color: const Color.fromRGBO(241, 80, 86, 1.0),
+                    showEditButton: false
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  /// Fetch the list of canceled tasks
-  Future<void> _getCanceledTaskListView({bool isFromRefresh = false}) async {
-    if (!isFromRefresh) {
-      _isLoadingData = true;
-      setState(() {});
-    }
+  Future<void> _refreshAllData() async {
+    await _getCanceledTaskListView(isFromRefresh: true);
+    _getTaskListController.update();
+  }
 
-    NetworkResponse networkResponse = await NetworkCaller.getRequest(
-      url: Urls.taskListByStatusUrl('Canceled'),
+  Future<void> _getCanceledTaskListView({bool isFromRefresh = false}) async {
+    bool completedTaskListIsSuccess = await _getTaskListController.getTaskList(
+      isFromRefresh: isFromRefresh,
+      statusName: 'Canceled',
     );
 
-    if (networkResponse.isSuccess) {
-      taskListModel =
-          TaskListByStatusModel.fromJson(networkResponse.statusData!);
-    } else {
-      Mymessage(networkResponse.errorMessage, context);
+    if (!completedTaskListIsSuccess) {
+      Mymessage(_getTaskListController.message, context);
     }
-    _isLoadingData = false;
-    setState(() {});
+    _getTaskListController.update();
   }
+
 }
+
+

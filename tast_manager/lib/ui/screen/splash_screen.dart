@@ -21,6 +21,8 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<Offset> _animation;
 
+  AuthController authController = Get.put(AuthController());
+
   @override
   void initState() {
     super.initState();
@@ -45,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> moveToNextScreen() async {
     await Future.delayed(const Duration(seconds: 4));
-    bool userLoggedIn = await AuthController.userLoggedIn();
+    bool userLoggedIn = await authController.userLoggedIn();
     if (userLoggedIn) {
       Get.offNamed( MainBottomNavScreen.name);
     } else {

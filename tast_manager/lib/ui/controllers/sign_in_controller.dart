@@ -10,6 +10,7 @@ class SignInController extends GetxController{
 
   bool _signInProgress = false;
   bool get signInProgress => _signInProgress;
+  AuthController authController = Get.put(AuthController());
 
   late String _message;
   String get message=> _message;
@@ -45,7 +46,7 @@ class SignInController extends GetxController{
       UserData? userData = UserData.fromJson(response.statusData?['data'] ?? {});
 
       if (token != null) {
-        await AuthController.saveData(token, userData);
+        await authController.saveData(token, userData);
         // Mymessage('LogIn Success', context);
         _message='LogIn Success';
         isSuccess =true;

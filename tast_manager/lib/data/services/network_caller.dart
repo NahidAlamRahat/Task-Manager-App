@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart';
 import 'package:tast_manager/app.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
@@ -10,7 +11,7 @@ class NetworkResponse {
   final bool isSuccess;
   final int statusCode;
   late final Map<String, dynamic>? statusData;
-  String? errorMessage;
+  String? errorMessage='server error';
 
   NetworkResponse({
     required this.statusCode,
@@ -22,6 +23,7 @@ class NetworkResponse {
 
 
 class NetworkCaller {
+
 
   /// Sends a GET request
   static Future<NetworkResponse> getRequest({
@@ -126,8 +128,10 @@ class NetworkCaller {
 
  /// [Token_expired] Logout the user and go to the sign-in screen.
   static Future<void> _logOut() async {
+    AuthController authController =AuthController();
+
     // Clear data
-    await AuthController.clearData();
+    await authController.clearData();
     Navigator.pushNamedAndRemoveUntil(
       TaskManager.navigatorKey.currentContext!,
       SignInScreen.name,

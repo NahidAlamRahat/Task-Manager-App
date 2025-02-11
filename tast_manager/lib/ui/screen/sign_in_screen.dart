@@ -28,7 +28,7 @@ class _SignInScreenState extends State<SignInScreen> {
   TextEditingController emailTEController = TextEditingController();
   TextEditingController passwordTEController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
- final SignInController _signInController = Get.find<SignInController>();
+  final SignInController _signInController = Get.find<SignInController>();
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +93,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                            logInRequest();
+                          logInRequest();
                         }
                       },
                       child: const Icon(Icons.arrow_circle_right_outlined),

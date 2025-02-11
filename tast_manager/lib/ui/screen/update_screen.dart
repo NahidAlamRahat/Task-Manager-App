@@ -8,6 +8,7 @@ import 'package:tast_manager/data/models/user_data.dart';
 import 'package:tast_manager/data/services/network_caller.dart';
 import 'package:tast_manager/data/utils/urls.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
+import 'package:tast_manager/ui/controllers/image_controller.dart';
 import 'package:tast_manager/ui/controllers/update_profile_controller.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
 import 'package:tast_manager/widgets/task_manager_app_bar.dart';
@@ -23,14 +24,16 @@ class UpdateScreen extends StatefulWidget {
 }
 
 class _UpdateScreenState extends State<UpdateScreen> {
-  TextEditingController emailTEController = TextEditingController();
-  TextEditingController passwordTEController = TextEditingController();
-  TextEditingController firstNameTEController = TextEditingController();
-  TextEditingController lastNameTEController = TextEditingController();
-  TextEditingController mobileTEController = TextEditingController();
-  TextEditingController imageTEController = TextEditingController();
-  final UpdateProfileController _updateProfileController = Get.put(UpdateProfileController());
+  final TextEditingController _emailTEController = TextEditingController();
+  final TextEditingController _passwordTEController = TextEditingController();
+  final TextEditingController _firstNameTEController = TextEditingController();
+  final TextEditingController _lastNameTEController = TextEditingController();
+  final TextEditingController _mobileTEController = TextEditingController();
 
+  final UpdateProfileController _updateProfileController = Get.put( UpdateProfileController());
+    ImageController imageController = ImageController();
+    AuthController authController = Get.put(AuthController());
+    AuthController _authController =AuthController();
 
   XFile? _imagePicker;
   TaskListByStatusModel? taskListModel;
@@ -42,10 +45,11 @@ class _UpdateScreenState extends State<UpdateScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    emailTEController.text = AuthController.userModel?.email ?? 'empty';
-    firstNameTEController.text = AuthController.userModel?.firstName ?? 'empty';
-    lastNameTEController.text = AuthController.userModel?.lastName ?? 'empty';
-    mobileTEController.text = AuthController.userModel?.mobile ?? 'empty';
+    _emailTEController.text =  authController.userModel.value?.email ?? 'empty';
+    _firstNameTEController.text = authController.userModel.value?.firstName ?? 'empty';
+    _lastNameTEController.text = authController.userModel.value?.lastName ?? 'empty';
+    _mobileTEController.text = authController.userModel.value?.mobile ?? 'empty';
+
   }
 
   @override
@@ -84,7 +88,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
                       return null;
                     },
                     keyboardType: TextInputType.emailAddress,
-                    controller: emailTEController,
+                    controller: _emailTEController,
                     decoration: const InputDecoration(hintText: 'Email'),
                   ),
                   const SizedBox(
@@ -99,7 +103,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
                       return null;
                     },
                     keyboardType: TextInputType.name,
-                    controller: firstNameTEController,
+                    controller: _firstNameTEController,
                     decoration: const InputDecoration(hintText: 'First Name'),
                   ),
                   const SizedBox(
@@ -114,7 +118,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
                       return null;
                     },
                     keyboardType: TextInputType.name,
-                    controller: lastNameTEController,
+                    controller: _lastNameTEController,
                     decoration: const InputDecoration(hintText: 'Last Name'),
                   ),
                   const SizedBox(
@@ -129,7 +133,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
                       return null;
                     },
                     keyboardType: TextInputType.phone,
-                    controller: mobileTEController,
+                    controller: _mobileTEController,
                     decoration: const InputDecoration(hintText: 'Mobile'),
                   ),
                   const SizedBox(
@@ -146,16 +150,26 @@ class _UpdateScreenState extends State<UpdateScreen> {
                       }
                       return null;
                     },
-                    controller: passwordTEController,
+                    controller: _passwordTEController,
                     decoration: const InputDecoration(hintText: 'Password'),
                   ),
                   const SizedBox(height: 12),
-                  ElevatedButton(
-                    onPressed:(){
-                      _UpdateProfile();
-                    },
-                    child: const Text('Update Profile'),
-                  ),
+
+                  GetBuilder<UpdateProfileController>(builder: (controller) {
+                    return Visibility(
+                      visible: controller.isLoadingDataProgress == false,
+                      replacement: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                            _updateProfile();
+                        },
+                        child: const Text('Update Profile'),
+                      ),
+                    );
+                  }),
+
                 ],
               ),
             ),
@@ -167,7 +181,10 @@ class _UpdateScreenState extends State<UpdateScreen> {
 
   Widget _buildPhotoWidget() {
     return GestureDetector(
-      onTap: _getImagePicker,
+      onTap:() {
+        getImagePicker();
+        print('image=> $_imagePicker');
+      },
       child: Container(
         height: 50,
         decoration: BoxDecoration(
@@ -212,91 +229,58 @@ class _UpdateScreenState extends State<UpdateScreen> {
         ),
       ),
     );
-  }
+   }
 
-  Future<void> _getImagePicker() async {
+  Future<void> getImagePicker() async {
     final ImagePicker picker = ImagePicker();
     XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       _imagePicker = image;
-      setState(() {});
+     setState(() {});
+     // imageController.update();
     }
+    print('image=> $image');
   }
 
-  Future<void> _UpdateProfile() async {
+ //  getImagePicker(){
+ //    imageController.getImagePicker(imagePicker: imagePicker);
+ // print('image=> $imagePicker');
+ //  }
+ //
+ //
+ //  getImagePicker({required XFile? image}){
+ //    imageController.getImagePicker(imagePicker: image);
+ //  print('image=> $image');
+ //  }
 
+
+
+
+  Future<void> _updateProfile() async {
     bool isSuccess = await _updateProfileController.updateProfile(
-        firstNameTEController.text.trim(),
-        lastNameTEController.text.trim(),
-        mobileTEController.text.trim(),
-        // imageTEController.text.trim(),
-        passwordTEController.text);
 
-   /* // Prepare the request body with updated profile data
-    Map<String, dynamic> requestBody = {
-      "firstName": firstNameTEController.text.trim(),
-      "lastName": lastNameTEController.text.trim(),
-      "mobile": mobileTEController.text.trim(),
-    };
+        firstName: _firstNameTEController.text.trim(),
+        lastName: _lastNameTEController.text.trim(),
+        mobile: _mobileTEController.text.trim(),
+        image: _imagePicker,
+        password: _passwordTEController.text);
 
-    // Add image data if selected
-    if (_imagePicker != null) {
-      List<int> imageBytes = await _imagePicker!.readAsBytes();
-      requestBody["photo"] = base64Encode(imageBytes);
+    if (isSuccess) {
+      Mymessage(_updateProfileController.message, context);
+
+    } else {
+      Mymessage(_updateProfileController.message, context);
     }
-
-    // Add password if provided
-    if (passwordTEController.text.isNotEmpty) {
-      requestBody["password"] = passwordTEController.text;
-    }
-
-    // Send the profile update request
-    final NetworkResponse networkResponse = await NetworkCaller.postRequest(
-      url: Urls.profileUpdateUrl,
-      body: requestBody,
-    );
-    print("Request Body: $requestBody");
-
-    _isLoadingDataProgress = false;
-    setState(() {});
-*/
-    // if (networkResponse.isSuccess && networkResponse.statusData!.isNotEmpty) {
-    //   try {
-    //     final Map<String, dynamic> responseData = networkResponse.statusData?['data'] ?? {};
-
-        if (isSuccess) {
-         /* UserData updatedUserData = UserData.fromJson({
-            "email": AuthController.userModel?.email,
-            "firstName": responseData['firstName'] ?? AuthController.userModel?.firstName,
-            "lastName": responseData['lastName'] ?? AuthController.userModel?.lastName,
-            "mobile": responseData['mobile'] ?? AuthController.userModel?.mobile,
-            "photo": responseData['photo'] ?? AuthController.userModel?.photo,
-          });
-*/
-          // await AuthController.saveData(AuthController.accessToken!, updatedUserData);
-
-          Mymessage(_updateProfileController.message, context);
-
-          print('Updated User Data:');
-          print('Email: ${AuthController.userModel?.email}');
-          print('First Name: ${AuthController.userModel?.firstName}');
-          print('Last Name: ${AuthController.userModel?.lastName}');
-          print('Mobile: ${AuthController.userModel?.mobile}');
-          print('Photo: ${AuthController.userModel?.photo}');
-        } else {
-          Mymessage(_updateProfileController.message, context);
-        }
-
   }
+
 
   @override
   void dispose() {
-    emailTEController.dispose();
-    passwordTEController.dispose();
-    firstNameTEController.dispose();
-    lastNameTEController.dispose();
-    mobileTEController.dispose();
-    imageTEController.dispose();
+    _emailTEController.dispose();
+    _passwordTEController.dispose();
+    _firstNameTEController.dispose();
+    _lastNameTEController.dispose();
+    _mobileTEController.dispose();
     super.dispose();
   }
 }

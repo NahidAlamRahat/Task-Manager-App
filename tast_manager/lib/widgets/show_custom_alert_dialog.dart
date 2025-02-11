@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-Future<void> ShowCustomAlertDialog(
-  BuildContext context, {
-  required Widget text,
-  required String message,
-  required VoidCallback onConfirm,
-  VoidCallback? onCancel,
-}) {
+Future<void> showCustomAlertDialog(
+    BuildContext context, {
+      required Widget text,
+      required String message,
+      required VoidCallback onConfirm,
+      VoidCallback? onCancel,
+    }) {
   return showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -15,7 +15,7 @@ Future<void> ShowCustomAlertDialog(
           children: [
             const Icon(Icons.add_alert),
             const SizedBox(width: 8),
-           text
+            text
           ],
         ),
         content: Text(message),
@@ -47,4 +47,3 @@ Future<void> ShowCustomAlertDialog(
     },
   );
 }
-

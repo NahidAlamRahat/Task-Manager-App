@@ -1,14 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tast_manager/data/services/network_caller.dart';
-import 'package:tast_manager/data/utils/urls.dart';
-import 'package:tast_manager/ui/screen/forget_pass_email_verification_screen.dart';
-import 'package:tast_manager/ui/screen/update_screen.dart';
+import 'package:tast_manager/ui/controllers/sign_up_controller.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
-
 import '../../utils/app_colors.dart';
 import '../../widgets/background_screen.dart';
 
@@ -28,9 +24,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController lastNameTEController = TextEditingController();
   TextEditingController mobileTEController = TextEditingController();
 
+  final SignUpController _signUpController = Get.put(SignUpController());
+
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   XFile? _imagePicker;
-  bool singUpInProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +51,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(height: 24),
                   _buildPhotoWidget(),
-                  SizedBox(height: 12,),
+                  SizedBox(
+                    height: 12,
+                  ),
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
@@ -132,15 +131,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(
                     height: 12,
                   ),
-                  Visibility(
-                    visible: singUpInProgress == false,
-                    replacement:
-                        const Center(child: CircularProgressIndicator()),
-                    child: ElevatedButton(
-                      onPressed: _onTapSingUpButton,
-                      child: const Icon(Icons.arrow_circle_right_outlined),
-                    ),
-                  ),
+                  GetBuilder<SignUpController>(builder: (controller) {
+                    return Visibility(
+                      visible: controller.singUpInProgress == false,
+                      replacement:
+                          const Center(child: CircularProgressIndicator()),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            _singUp();
+                          }
+                        },
+                        child: const Icon(Icons.arrow_circle_right_outlined),
+                      ),
+                    );
+                  }),
                   const SizedBox(
                     height: 20,
                   ),
@@ -152,12 +157,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
     );
-  }
-
-  void _onTapSingUpButton() {
-    if (formKey.currentState!.validate()) {
-      _singUp();
-    }
   }
 
   Widget _buildPhotoWidget() {
@@ -191,7 +190,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             const SizedBox(width: 16),
-
             Expanded(
               child: Text(
                 _imagePicker == null ? 'No item selected' : _imagePicker!.name,
@@ -212,7 +210,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> _getImagePicker() async {
     final ImagePicker picker = ImagePicker();
-    XFile? image= await picker.pickImage(source: ImageSource.gallery);
+    XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       _imagePicker = image;
       setState(() {});
@@ -220,34 +218,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _singUp() async {
-    singUpInProgress = true;
-    setState(() {});
+    bool singUpIsSuccess = await _signUpController.singUp(
+        firstName: firstNameTEController.text.trim(),
+        lastName: lastNameTEController.text.trim(),
+        mobile: mobileTEController.text.trim(),
+        email: emailTEController.text.trim(),
+        password: passwordTEController.text);
+    if (singUpIsSuccess) {
+      // Mymessage(
+      //     '${firstNameTEController.text.trim()} Your Registration Completed', context);
+      Mymessage(_signUpController.message, context);
 
-    Map<String, dynamic> requestBody = {
-      "email": emailTEController.text.trim(),
-      "firstName": firstNameTEController.text.trim(),
-      "lastName": lastNameTEController.text.trim(),
-      "mobile": mobileTEController.text.trim(),
-      "password": passwordTEController.text,
-    };
-    if(_imagePicker != null){
-      List<int> imageBytes = await _imagePicker!.readAsBytes();
-      requestBody["photo"]= base64Encode(imageBytes);
-    }
-
-    final NetworkResponse response = await NetworkCaller.postRequest(
-        url: Urls.registrationUrl, body: requestBody);
-
-    singUpInProgress = false;
-    setState(() {});
-
-    if (response.isSuccess) {
-      Mymessage(
-          '${firstNameTEController.text} Your Registration Completed', context);
       const Duration(seconds: 2);
-      Navigator.pop(context);
+      Get.back();
     } else {
-      Mymessage('Something went wrong! Please try again', context);
+      Mymessage(_signUpController.message, context);
     }
   }
 
