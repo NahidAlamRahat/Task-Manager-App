@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
 import 'package:tast_manager/ui/screen/bottom_nav_screen/main_bottom_nav_screen.dart';
 import 'package:tast_manager/ui/screen/sign_in_screen.dart';
 import 'package:tast_manager/widgets/background_screen.dart';
-
 import '../../widgets/app_logo.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -57,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _controller.dispose(); // Dispose the animation controller
+    _controller.dispose();
     super.dispose();
   }
 

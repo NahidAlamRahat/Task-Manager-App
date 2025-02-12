@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import '../../data/models/user_data.dart';
 import '../../data/services/network_caller.dart';
 import '../../data/utils/urls.dart';
-import '../screen/bottom_nav_screen/main_bottom_nav_screen.dart';
 import 'auth_controller.dart';
 
 class SignInController extends GetxController{
@@ -47,11 +46,9 @@ class SignInController extends GetxController{
 
       if (token != null) {
         await authController.saveData(token, userData);
-        // Mymessage('LogIn Success', context);
         _message='LogIn Success';
         isSuccess =true;
       } else {
-        // Mymessage('Email/Password Invalid. Please try again!', context);
         _message ='Email/Password Invalid. Please try again!';
       }
     }

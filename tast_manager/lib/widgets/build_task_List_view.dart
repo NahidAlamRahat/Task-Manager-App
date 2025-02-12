@@ -1,36 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tast_manager/widgets/task_item_widget.dart';
-
 import '../data/models/task_model.dart';
-
-/*class BuildTaskListView{
-
- static Widget buildTaskListView({required List<TaskModel> taskList, required String status}) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: ListView.builder(
-            shrinkWrap: true,
-            primary: false,
-            itemCount: taskList.length,
-            itemBuilder: (context, index) {
-              return TaskItemWidget(
-                color: const Color.fromRGBO(33, 191, 115, 1),
-                taskModel:taskList[index],
-                status: status,
-                showEditButton: true,
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-}*/
-
 
 
 class BuildTaskListView {

@@ -1,11 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:tast_manager/ui/controllers/forget_pass_pin_verification_controller.dart';
 import 'package:tast_manager/ui/screen/recover_reset_password_screen.dart';
-import '../../data/services/network_caller.dart';
-import '../../data/utils/urls.dart';
 import '../../widgets/background_screen.dart';
 import '../../widgets/show_snackber_message.dart';
 
@@ -27,6 +24,8 @@ class ForgetPassPinVerification extends StatefulWidget {
 class _ForgetPassPinVerificationState extends State<ForgetPassPinVerification> {
   TextEditingController otpTEController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final ForgetPassPinVerificationController _forgetPassPinVerificationController = Get
+      .find<ForgetPassPinVerificationController>();
 
   /// input a 6-digit OTP for verification.
   @override
@@ -102,22 +101,20 @@ class _ForgetPassPinVerificationState extends State<ForgetPassPinVerification> {
 
   /// Sends the OTP entered by the user to the server for validation.
   Future<void> _getPinVerify() async {
-    // API Call
-    NetworkResponse networkResponse = await NetworkCaller.getRequest(
-        url: Urls.recoverVerifyOTP(widget.email, otpTEController.text));
-
-    if (networkResponse.statusData?['status'] == 'success') {
+    bool getPinVerifyIsSuccess = await _forgetPassPinVerificationController
+        .getPinVerify(email: widget.email, otp: otpTEController.text.trim());
+    if (getPinVerifyIsSuccess) {
      Get.toNamed(
           arguments: {'otp': otpTEController.text, 'email': widget.email},
           RecoverResetPasswordScreen.name);
     } else {
-      Mymessage('Invalid OTP. Please try again.', context);
+      Mymessage(_forgetPassPinVerificationController.message, context);
     }
   }
 
-  @override
+/*  @override
   void dispose() {
     otpTEController.dispose();
     super.dispose();
-  }
+  }*/
 }

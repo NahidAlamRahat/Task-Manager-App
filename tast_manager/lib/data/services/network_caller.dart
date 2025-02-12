@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart';
 import 'package:tast_manager/app.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';

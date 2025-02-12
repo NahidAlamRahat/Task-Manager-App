@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 Future<void> showCustomAlertDialog(
     BuildContext context, {
@@ -23,7 +24,6 @@ Future<void> showCustomAlertDialog(
           TextButton(
             onPressed: () {
               onConfirm();
-              /// Fetches the new task list from the network
             },
             child: const Text(
               'Yes',
@@ -35,7 +35,7 @@ Future<void> showCustomAlertDialog(
               if (onCancel != null) {
                 onCancel();
               }
-              Navigator.of(context).pop(); // Close the dialog
+              Get.back(); // Close the dialog
             },
             child: const Text(
               'No',

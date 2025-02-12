@@ -1,17 +1,11 @@
-import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tast_manager/data/models/user_data.dart';
-import 'package:tast_manager/data/services/network_caller.dart';
-import 'package:tast_manager/data/utils/urls.dart';
-import 'package:tast_manager/ui/controllers/auth_controller.dart';
 import 'package:tast_manager/ui/controllers/sign_in_controller.dart';
 import 'package:tast_manager/ui/screen/bottom_nav_screen/main_bottom_nav_screen.dart';
 import 'package:tast_manager/ui/screen/forget_pass_email_verification_screen.dart';
 import 'package:tast_manager/ui/screen/sign_up_screen.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
-
 import '../../utils/app_colors.dart';
 import '../../widgets/background_screen.dart';
 
@@ -28,7 +22,7 @@ class _SignInScreenState extends State<SignInScreen> {
   TextEditingController emailTEController = TextEditingController();
   TextEditingController passwordTEController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final SignInController _signInController = Get.find<SignInController>();
+  final SignInController _signInController = Get.put(SignInController());
 
   @override
   Widget build(BuildContext context) {
@@ -115,9 +109,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         },
                         child: const Text('Forget password'),
                       ),
-                      const SizedBox(
-                        height: 6,
-                      ),
+                      const SizedBox(height: 6),
                       buildRichText(),
                     ],
                   ),
@@ -160,17 +152,17 @@ class _SignInScreenState extends State<SignInScreen> {
 
     if (isSuccess) {
       Mymessage(_signInController.message, context);
-      Get.offAllNamed(MainBottomNavScreen.name);
+      Get.offNamed(MainBottomNavScreen.name);
     } else {
       Mymessage(_signInController.message, context);
 
     }
   }
-
-  @override
-  void dispose() {
-    emailTEController.dispose();
-    passwordTEController.dispose();
-    super.dispose();
-  }
+  //
+  // @override
+  // void dispose() {
+  //   emailTEController.dispose();
+  //   passwordTEController.dispose();
+  //   super.dispose();
+  // }
 }

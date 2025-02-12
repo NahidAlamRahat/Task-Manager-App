@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
 import 'package:tast_manager/ui/screen/sign_in_screen.dart';
 import 'package:tast_manager/ui/screen/update_screen.dart';
@@ -80,11 +79,7 @@ class TaskManagerAppBar extends StatelessWidget implements PreferredSizeWidget {
                 message: 'Are you sure you want to logout?',
                 onConfirm: () async {
                   await authController.clearData();
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    SignInScreen.name,
-                        (route) => false,
-                  );
+                 Get.offNamedUntil(SignInScreen.name, (route) => false,);
                 },
               );
             },

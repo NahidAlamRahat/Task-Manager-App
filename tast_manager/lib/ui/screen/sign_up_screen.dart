@@ -1,11 +1,9 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tast_manager/ui/controllers/sign_up_controller.dart';
+import 'package:tast_manager/widgets/build_rich_text.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
-import '../../utils/app_colors.dart';
 import '../../widgets/background_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -51,9 +49,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(height: 24),
                   _buildPhotoWidget(),
-                  SizedBox(
-                    height: 12,
-                  ),
+                  const SizedBox(height: 12),
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
@@ -146,10 +142,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     );
                   }),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Center(child: buildRichText())
+                  const SizedBox(height: 20),
+                  Center(child: BuildRichText.buildRichText())
                 ],
               ),
             ),
@@ -225,8 +219,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         email: emailTEController.text.trim(),
         password: passwordTEController.text);
     if (singUpIsSuccess) {
-      // Mymessage(
-      //     '${firstNameTEController.text.trim()} Your Registration Completed', context);
       Mymessage(_signUpController.message, context);
 
       const Duration(seconds: 2);
@@ -236,28 +228,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  Widget buildRichText() {
-    return RichText(
-      text: TextSpan(
-        text: "Already have an account? ",
-        style: TextStyle(
-          color: AppColors.blackColor,
-          fontWeight: FontWeight.w600,
-        ),
-        children: [
-          TextSpan(
-              text: 'Sign in',
-              style: TextStyle(
-                color: AppColors.themColor,
-              ),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  Navigator.pop(context);
-                }),
-        ],
-      ),
-    );
-  }
+  // Widget buildRichText() {
+  //   return RichText(
+  //     text: TextSpan(
+  //       text: "Already have an account? ",
+  //       style: TextStyle(
+  //         color: AppColors.blackColor,
+  //         fontWeight: FontWeight.w600,
+  //       ),
+  //       children: [
+  //         TextSpan(
+  //             text: 'Sign in',
+  //             style: TextStyle(
+  //               color: AppColors.themColor,
+  //             ),
+  //             recognizer: TapGestureRecognizer()
+  //               ..onTap = () {
+  //                 Get.back();
+  //               }),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   @override
   void dispose() {

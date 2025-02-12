@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tast_manager/ui/controllers/add_new_task_controller.dart';
 import 'package:tast_manager/ui/screen/bottom_nav_screen/main_bottom_nav_screen.dart';
-import '../../data/services/network_caller.dart';
-import '../../data/utils/urls.dart';
 import '../../widgets/background_screen.dart';
 import '../../widgets/show_snackber_message.dart';
 import '../../widgets/task_manager_app_bar.dart';
@@ -109,7 +107,6 @@ final AddNewTaskController _addNewTaskController = Get.find<AddNewTaskController
     if (addNewTaskItemIsSuccess) {
       _clearData();
       Mymessage(_addNewTaskController.message, context);
-      // Get.offUntil(const MainBottomNavScreen(initialIndex: 0,) as Route, (route) => false,);
       Get.offAll(() => const MainBottomNavScreen(initialIndex: 0));
     } else {
       Mymessage(_addNewTaskController.message, context);

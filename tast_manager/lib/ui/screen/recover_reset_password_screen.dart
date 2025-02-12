@@ -1,12 +1,10 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:tast_manager/ui/controllers/recover_reset_password_controller.dart';
 import 'package:tast_manager/ui/screen/sign_in_screen.dart';
 import 'package:tast_manager/widgets/show_snackber_message.dart';
-import '../../utils/app_colors.dart';
 import '../../widgets/background_screen.dart';
+import '../../widgets/build_rich_text.dart';
 
 class RecoverResetPasswordScreen extends StatefulWidget {
   static String name = 'forget/pass/reset/password';
@@ -107,10 +105,8 @@ class _RecoverResetPasswordScreenState
                 const SizedBox(
                   height: 20,
                 ),
-                const SizedBox(
-                  height: 6,
-                ),
-                Center(child: buildRichText())
+                const SizedBox(height: 6),
+                Center(child: BuildRichText.buildRichText())
               ],
             ),
           ),
@@ -119,26 +115,6 @@ class _RecoverResetPasswordScreenState
     );
   }
 
-  /// Builds a rich text widget with a "Sign in".
-  Widget buildRichText() {
-    return RichText(
-      text: TextSpan(
-          text: "Have an account? ",
-          style: TextStyle(
-            color: AppColors.blackColor,
-            fontWeight: FontWeight.w600,
-          ),
-          children: [
-            TextSpan(
-                text: ' Sign in',
-                style: TextStyle(color: AppColors.themColor),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    Get.offNamedUntil(SignInScreen.name, (route) => false);
-                  }),
-          ]),
-    );
-  }
 
   /// Sends the new password along with the OTP to reset the password.
   Future<void> _postResetPassword() async {
@@ -146,19 +122,17 @@ class _RecoverResetPasswordScreenState
         email: widget.email, otp: widget.otp, password: _passwordTEController.text);
 
     if (isSuccess) {
-      Get.offNamedUntil(
-        SignInScreen.name,
-        (route) => false);  //error
       Mymessage(_recoverResetPasswordController.message, context);
+      Get.offAndToNamed(SignInScreen.name);
     } else {
-      Mymessage(_recoverResetPasswordController.message, context);
+        Mymessage(_recoverResetPasswordController.message, context);
     }
   }
-
+/*
   @override
   void dispose() {
     _passwordTEController.dispose();
     _confirmPasswordTEController.dispose();
     super.dispose();
-  }
+  }*/
 }

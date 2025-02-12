@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../data/services/network_caller.dart';
 import '../../data/utils/urls.dart';
-import '../../widgets/show_snackber_message.dart';
 
 
 class SignUpController extends GetxController{

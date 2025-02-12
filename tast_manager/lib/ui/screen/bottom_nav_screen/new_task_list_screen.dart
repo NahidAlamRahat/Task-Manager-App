@@ -23,7 +23,7 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
 
   /// Refresh both task count and task list
   Future<void> _refreshAllData() async {
-    _newTaskListController.isLoading.value = true; // Set loading true
+    _newTaskListController.isLoading.value = true;
     await _getTaskCountByStatus(isFromRefresh: true);
     await _getNewTaskList(isFromRefresh: true);
     _newTaskListController.isAppBarRebuilt.value = true;
@@ -33,13 +33,12 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
   void initState() {
     super.initState();
 // Execute code after the initial widget tree has been built and displayed
-     WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _newTaskListController.isLoading.value = true;
       _getTaskCountByStatus(isFromRefresh: false);
       _getNewTaskList(isFromRefresh: false);
     });
   }
-
 
   @override
   Widget build(BuildContext context) {

@@ -1,12 +1,17 @@
 import 'package:get/get.dart';
 import 'package:tast_manager/ui/controllers/add_new_task_controller.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
+import 'package:tast_manager/ui/controllers/delete_item_controller.dart';
+import 'package:tast_manager/ui/controllers/email_verification_controller.dart';
+import 'package:tast_manager/ui/controllers/forget_pass_pin_verification_controller.dart';
 import 'package:tast_manager/ui/controllers/get_task_list_controller.dart';
+import 'package:tast_manager/ui/controllers/main_bottom_nav_controller.dart';
 import 'package:tast_manager/ui/controllers/new_task_list_controller.dart';
 import 'package:tast_manager/ui/controllers/recover_reset_password_controller.dart';
 import 'package:tast_manager/ui/controllers/sign_in_controller.dart';
 import 'package:tast_manager/ui/controllers/sign_up_controller.dart';
 import 'package:tast_manager/ui/controllers/update_profile_controller.dart';
+import 'package:tast_manager/ui/controllers/update_todo_status_controller.dart';
 
 class ControllerBinder extends Bindings{
 
@@ -19,9 +24,15 @@ class ControllerBinder extends Bindings{
     Get.lazyPut(() => SignUpController());
     Get.lazyPut(() => RecoverResetPasswordController());
     Get.lazyPut(() => AddNewTaskController());
+    Get.lazyPut(() => EmailVerificationController());
+    Get.lazyPut(() => ForgetPassPinVerificationController());
 
     Get.put(NewTaskListController());
     Get.put(GetTaskListController());
+    Get.put(UpdateTodoStatusController());
+    Get.put(DeleteItemController());
+    Get.put(MainBottomNavController());
+
 
 
   }

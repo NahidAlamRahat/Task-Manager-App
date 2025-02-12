@@ -1,12 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tast_manager/data/models/task_list_by_status_model.dart';
 import 'package:tast_manager/data/models/user_data.dart';
-import 'package:tast_manager/data/services/network_caller.dart';
-import 'package:tast_manager/data/utils/urls.dart';
 import 'package:tast_manager/ui/controllers/auth_controller.dart';
 import 'package:tast_manager/ui/controllers/image_controller.dart';
 import 'package:tast_manager/ui/controllers/update_profile_controller.dart';
@@ -33,7 +29,6 @@ class _UpdateScreenState extends State<UpdateScreen> {
   final UpdateProfileController _updateProfileController = Get.put( UpdateProfileController());
     ImageController imageController = ImageController();
     AuthController authController = Get.put(AuthController());
-    AuthController _authController =AuthController();
 
   XFile? _imagePicker;
   TaskListByStatusModel? taskListModel;
@@ -106,9 +101,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
                     controller: _firstNameTEController,
                     decoration: const InputDecoration(hintText: 'First Name'),
                   ),
-                  const SizedBox(
-                    height: 12,
-                  ),
+                  const SizedBox(height: 12),
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
@@ -136,9 +129,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
                     controller: _mobileTEController,
                     decoration: const InputDecoration(hintText: 'Mobile'),
                   ),
-                  const SizedBox(
-                    height: 12,
-                  ),
+                  const SizedBox(height: 12),
                   TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (String? value) {
@@ -169,7 +160,6 @@ class _UpdateScreenState extends State<UpdateScreen> {
                       ),
                     );
                   }),
-
                 ],
               ),
             ),
@@ -242,20 +232,6 @@ class _UpdateScreenState extends State<UpdateScreen> {
     print('image=> $image');
   }
 
- //  getImagePicker(){
- //    imageController.getImagePicker(imagePicker: imagePicker);
- // print('image=> $imagePicker');
- //  }
- //
- //
- //  getImagePicker({required XFile? image}){
- //    imageController.getImagePicker(imagePicker: image);
- //  print('image=> $image');
- //  }
-
-
-
-
   Future<void> _updateProfile() async {
     bool isSuccess = await _updateProfileController.updateProfile(
 
@@ -272,7 +248,6 @@ class _UpdateScreenState extends State<UpdateScreen> {
       Mymessage(_updateProfileController.message, context);
     }
   }
-
 
   @override
   void dispose() {

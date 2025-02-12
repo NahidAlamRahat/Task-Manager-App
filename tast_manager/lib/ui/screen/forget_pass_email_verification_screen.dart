@@ -1,13 +1,9 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:tast_manager/ui/controllers/email_verification_controller.dart';
 import 'package:tast_manager/ui/screen/forget_pass_pin_verification_screen.dart';
-
-import '../../data/services/network_caller.dart';
-import '../../data/utils/urls.dart';
-import '../../utils/app_colors.dart';
 import '../../widgets/background_screen.dart';
+import '../../widgets/build_rich_text.dart';
 import '../../widgets/show_snackber_message.dart';
 
 class ForgetPassEmailVerification extends StatefulWidget {
@@ -24,6 +20,7 @@ class _ForgetPassEmailVerificationState
     extends State<ForgetPassEmailVerification> {
   final TextEditingController _emailTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final EmailVerificationController _emailVerificationController = Get.find<EmailVerificationController>();
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +72,7 @@ class _ForgetPassEmailVerificationState
                 ),
                 const SizedBox(height: 20),
                 const SizedBox(height: 6),
-                Center(child: buildRichText())
+                Center(child: BuildRichText.buildRichText())
               ],
             ),
           ),
@@ -84,40 +81,22 @@ class _ForgetPassEmailVerificationState
     );
   }
 
-  Widget buildRichText() {
-    return RichText(
-      text: TextSpan(
-      text: "Have an account? ",
-      style: TextStyle(
-      color: AppColors.blackColor,
-      fontWeight: FontWeight.w600),
-      children: [
-      TextSpan(
-      text: ' Sign in',
-      style: TextStyle(color: AppColors.themColor),
-      recognizer: TapGestureRecognizer()..onTap = () {
-       Navigator.pop(context);
-     }),
-     ]),
-    );
-  }
+  Future _emailVerification() async {
+    bool emailVerificationIsSuccess = await _emailVerificationController
+        .emailVerification(email: _emailTEController.text.trim());
 
-  Future<void> _emailVerification() async {
-    NetworkResponse networkResponse = await NetworkCaller.getRequest(
-        url: Urls.recoverVerifyEmailUrl(_emailTEController.text.trim()));
-
-    if (networkResponse.isSuccess) {
-      Mymessage('Check your email', context);
+    if (emailVerificationIsSuccess) {
+      Mymessage(_emailVerificationController.message, context);
       Get.toNamed( ForgetPassPinVerification.name,
           arguments: _emailTEController.text.trim());
     } else {
-      Mymessage(networkResponse.errorMessage, context);
+      Mymessage(_emailVerificationController.message, context);
     }
   }
 
-  @override
+/*  @override
   void dispose() {
     _emailTEController.dispose();
     super.dispose();
-  }
+  }*/
 }
