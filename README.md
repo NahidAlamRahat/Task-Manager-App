@@ -10,7 +10,7 @@ A Flutter Task Management App using GetX with API integration for full-stack fun
 
 Here is a preview of the app interface:
 
-![Alt text](https://ibb.co.com/67Gx34YY)
+![image alt](https://github.com/NahidAlamRahat/Task-Manager-App/blob/77e7d193eef7f713335072e8aaa0f4f774f68924/task%20manager%20app.png)
 
 
 
