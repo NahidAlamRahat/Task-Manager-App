@@ -8,7 +8,7 @@ A Flutter Task Management App using GetX with API integration for full-stack fun
 
 Here is a preview of the app interface:
 
-![Task Manager Preview](https://github.com/NahidAlamRahat/Task-Manager-App/assets/101563052/58ef911f-cf08-48df-8225-f902600a0ba2)
+![Task Manager Preview](https://github.com/NahidAlamRahat/Task-Manager-App/issues/1#issue-3014344845)
 
 ---
 
@@ -31,5 +31,4 @@ Here is a preview of the app interface:
 
 ---
 
-## 📂 Folder Structure
 
